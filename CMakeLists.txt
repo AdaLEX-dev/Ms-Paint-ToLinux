@@ -36,6 +36,8 @@ set(SOURCES
     src/Dialogs/ResizeSkewDialog.cpp
     src/Dialogs/ImagePropertiesDialog.h
     src/Dialogs/ImagePropertiesDialog.cpp
+    src/Ribbon/PaintIcons.h
+    src/Ribbon/PaintIcons.cpp
     src/Tools/ToolTypes.h
 )
 
@@ -52,6 +54,8 @@ add_executable(test_canvas
     tests/test_canvas.cpp
     src/Canvas/PaintCanvas.h
     src/Canvas/PaintCanvas.cpp
+    src/Ribbon/PaintIcons.h
+    src/Ribbon/PaintIcons.cpp
     src/Tools/ToolTypes.h
 )
 

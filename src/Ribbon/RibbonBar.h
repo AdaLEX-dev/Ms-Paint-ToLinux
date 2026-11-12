@@ -22,6 +22,8 @@ signals:
     void openTriggered();
     void saveTriggered();
     void saveAsTriggered(const QString& format);
+    void undoTriggered();
+    void redoTriggered();
     void propertiesTriggered();
     void aboutTriggered();
     void exitTriggered();

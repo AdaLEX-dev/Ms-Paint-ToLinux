@@ -1,7 +1,9 @@
 #include "RibbonBar.h"
+#include "PaintIcons.h"
 #include <QHBoxLayout>
 #include <QVBoxLayout>
 #include <QTabBar>
+#include <QToolButton>
 #include <QApplication>
 
 RibbonBar::RibbonBar(QWidget* parent)
@@ -13,21 +15,45 @@ RibbonBar::RibbonBar(QWidget* parent)
     rootLayout->setContentsMargins(0, 0, 0, 0);
     rootLayout->setSpacing(0);
 
-    // Header bar with File button + Home/View tabs
+    // Header bar with Quick Access + File button + Home/View tabs
     QWidget* headerBar = new QWidget(this);
     headerBar->setFixedHeight(32);
     headerBar->setStyleSheet("background-color: #f5f6f7;");
 
     QHBoxLayout* hLayout = new QHBoxLayout(headerBar);
     hLayout->setContentsMargins(4, 3, 4, 0);
-    hLayout->setSpacing(0);
+    hLayout->setSpacing(2);
+
+    // Quick Access Toolbar
+    auto makeQatBtn = [headerBar](const QIcon& icon, const QString& tip) {
+        QToolButton* b = new QToolButton(headerBar);
+        b->setIcon(icon);
+        b->setIconSize(QSize(16, 16));
+        b->setToolTip(tip);
+        b->setFixedSize(24, 24);
+        b->setStyleSheet("QToolButton { background: transparent; border: 1px solid transparent; border-radius: 2px; }"
+                         "QToolButton:hover { background: #e5f1fb; border-color: #0078d7; }");
+        return b;
+    };
+
+    QToolButton* qatSave = makeQatBtn(PaintIcons::saveIcon(16), "Save (Ctrl+S)");
+    connect(qatSave, &QToolButton::clicked, this, &RibbonBar::saveTriggered);
+    hLayout->addWidget(qatSave);
+
+    QToolButton* qatUndo = makeQatBtn(PaintIcons::undoIcon(16), "Undo (Ctrl+Z)");
+    connect(qatUndo, &QToolButton::clicked, this, &RibbonBar::undoTriggered);
+    hLayout->addWidget(qatUndo);
+
+    QToolButton* qatRedo = makeQatBtn(PaintIcons::redoIcon(16), "Redo (Ctrl+Y)");
+    connect(qatRedo, &QToolButton::clicked, this, &RibbonBar::redoTriggered);
+    hLayout->addWidget(qatRedo);
 
     // Blue Windows 10 "File" button
     m_fileButton = new QPushButton("File", headerBar);
     m_fileButton->setFixedSize(56, 25);
     m_fileButton->setStyleSheet(
         "QPushButton {"
-        "  background-color: #0078d7; color: white; border: none; font-size: 11px; font-weight: bold; border-top-left-radius: 2px; border-top-right-radius: 2px;"
+        "  background-color: #0078d7; color: white; border: none; font-size: 11px; font-weight: bold; border-top-left-radius: 2px; border-top-right-radius: 2px; margin-left: 4px;"
         "}"
         "QPushButton:hover { background-color: #106ebe; }"
         "QPushButton:pressed { background-color: #005a9e; }"
@@ -66,16 +92,16 @@ void RibbonBar::setupFileMenu() {
         "QMenu::item:selected { background: #e5f1fb; color: #000; }"
     );
 
-    QAction* actNew = menu->addAction("New\tCtrl+N");
+    QAction* actNew = menu->addAction(PaintIcons::newIcon(16), "New\tCtrl+N");
     connect(actNew, &QAction::triggered, this, &RibbonBar::newTriggered);
 
-    QAction* actOpen = menu->addAction("Open\tCtrl+O");
+    QAction* actOpen = menu->addAction(PaintIcons::openIcon(16), "Open\tCtrl+O");
     connect(actOpen, &QAction::triggered, this, &RibbonBar::openTriggered);
 
-    QAction* actSave = menu->addAction("Save\tCtrl+S");
+    QAction* actSave = menu->addAction(PaintIcons::saveIcon(16), "Save\tCtrl+S");
     connect(actSave, &QAction::triggered, this, &RibbonBar::saveTriggered);
 
-    QMenu* saveAsMenu = menu->addMenu("Save as");
+    QMenu* saveAsMenu = menu->addMenu(PaintIcons::saveAsIcon(16), "Save as");
     QAction* saPNG = saveAsMenu->addAction("PNG picture");
     connect(saPNG, &QAction::triggered, this, [this]() { emit saveAsTriggered("PNG"); });
     QAction* saJPG = saveAsMenu->addAction("JPEG picture");
@@ -86,14 +112,14 @@ void RibbonBar::setupFileMenu() {
     connect(saGIF, &QAction::triggered, this, [this]() { emit saveAsTriggered("GIF"); });
 
     menu->addSeparator();
-    QAction* actProps = menu->addAction("Properties");
+    QAction* actProps = menu->addAction(PaintIcons::propertiesIcon(16), "Properties\tCtrl+E");
     connect(actProps, &QAction::triggered, this, &RibbonBar::propertiesTriggered);
 
-    QAction* actAbout = menu->addAction("About Paint");
+    QAction* actAbout = menu->addAction(PaintIcons::aboutIcon(16), "About Paint");
     connect(actAbout, &QAction::triggered, this, &RibbonBar::aboutTriggered);
 
     menu->addSeparator();
-    QAction* actExit = menu->addAction("Exit");
+    QAction* actExit = menu->addAction(PaintIcons::exitIcon(16), "Exit");
     connect(actExit, &QAction::triggered, this, &RibbonBar::exitTriggered);
 
     m_fileButton->setMenu(menu);

@@ -2,12 +2,14 @@
 #include <QStyleFactory>
 #include <QFont>
 #include "MainWindow.h"
+#include "Ribbon/PaintIcons.h"
 
 int main(int argc, char* argv[]) {
     QApplication app(argc, argv);
     app.setApplicationName("Paint");
     app.setApplicationDisplayName("Paint");
     app.setOrganizationName("Microsoft");
+    app.setWindowIcon(PaintIcons::appIcon(64));
 
     // Modern clean styling
     app.setStyle(QStyleFactory::create("Fusion"));

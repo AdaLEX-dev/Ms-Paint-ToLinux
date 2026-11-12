@@ -1,4 +1,5 @@
 #include "BrushGallery.h"
+#include "PaintIcons.h"
 #include <QVBoxLayout>
 #include <QLabel>
 #include <QPainter>
@@ -17,21 +18,7 @@ BrushGallery::BrushGallery(QWidget* parent)
     m_button->setToolButtonStyle(Qt::ToolButtonTextUnderIcon);
     m_button->setPopupMode(QToolButton::InstantPopup);
     m_button->setFixedSize(55, 55);
-
-    // Paint an authentic Win10 Brush Icon
-    QPixmap iconPix(32, 32);
-    iconPix.fill(Qt::transparent);
-    QPainter p(&iconPix);
-    p.setRenderHint(QPainter::Antialiasing, true);
-    p.setPen(QPen(QColor(120, 80, 40), 4, Qt::SolidLine, Qt::RoundCap));
-    p.drawLine(8, 24, 20, 12);
-    p.setPen(QPen(QColor(180, 180, 180), 6, Qt::SolidLine, Qt::RoundCap));
-    p.drawLine(18, 14, 22, 10);
-    p.setPen(QPen(QColor(40, 40, 40), 6, Qt::SolidLine, Qt::RoundCap));
-    p.drawLine(22, 10, 26, 6);
-    p.end();
-
-    m_button->setIcon(QIcon(iconPix));
+    m_button->setIcon(PaintIcons::brushesMainIcon(28));
     m_button->setIconSize(QSize(28, 28));
     m_button->setStyleSheet(
         "QToolButton {"
@@ -72,7 +59,7 @@ void BrushGallery::setupMenu() {
     };
 
     for (const auto& b : brushes) {
-        QAction* act = m_menu->addAction(b.name);
+        QAction* act = m_menu->addAction(PaintIcons::brushTypeIcon(b.type, 20), b.name);
         connect(act, &QAction::triggered, this, [this, b]() {
             m_currentBrush = b.type;
             emit brushChanged(m_currentBrush);

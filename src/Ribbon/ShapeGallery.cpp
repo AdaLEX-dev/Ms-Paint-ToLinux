@@ -1,4 +1,5 @@
 #include "ShapeGallery.h"
+#include "PaintIcons.h"
 #include <QPainter>
 #include <QPainterPath>
 #include <QMouseEvent>
@@ -48,106 +49,9 @@ void ShapeGallery::paintEvent(QPaintEvent* event) {
     // Draw 23 shape thumbnail boxes
     for (int i = 0; i < NUM_SHAPES; ++i) {
         QRect r = getShapeRect(i);
-        if (static_cast<int>(m_selectedShape) == i) {
-            p.fillRect(r, QColor(204, 232, 255));
-            p.setPen(QColor(0, 120, 215));
-            p.drawRect(r);
-        } else {
-            p.setPen(QColor(220, 220, 220));
-            p.drawRect(r);
-        }
-
-        p.setPen(Qt::black);
-        p.setBrush(Qt::NoBrush);
-
-        QRect iconR = r.adjusted(3, 3, -3, -3);
-        int x = iconR.x(), y = iconR.y(), w = iconR.width(), h = iconR.height();
-
-        switch (static_cast<ShapeType>(i)) {
-            case ShapeType::Line:
-                p.drawLine(iconR.topLeft(), iconR.bottomRight());
-                break;
-            case ShapeType::Curve: {
-                QPainterPath path;
-                path.moveTo(iconR.topLeft());
-                path.quadTo(iconR.center() + QPoint(2, -2), iconR.bottomRight());
-                p.drawPath(path);
-                break;
-            }
-            case ShapeType::Oval:
-                p.drawEllipse(iconR);
-                break;
-            case ShapeType::Rectangle:
-                p.drawRect(iconR);
-                break;
-            case ShapeType::RoundedRect:
-                p.drawRoundedRect(iconR, 3, 3);
-                break;
-            case ShapeType::Triangle: {
-                QPolygon poly;
-                poly << QPoint(x + w / 2, y) << QPoint(x + w, y + h) << QPoint(x, y + h);
-                p.drawPolygon(poly);
-                break;
-            }
-            case ShapeType::RightTriangle: {
-                QPolygon poly;
-                poly << QPoint(x, y) << QPoint(x + w, y + h) << QPoint(x, y + h);
-                p.drawPolygon(poly);
-                break;
-            }
-            case ShapeType::Diamond: {
-                QPolygon poly;
-                poly << QPoint(x + w / 2, y) << QPoint(x + w, y + h / 2) << QPoint(x + w / 2, y + h) << QPoint(x, y + h / 2);
-                p.drawPolygon(poly);
-                break;
-            }
-            case ShapeType::Pentagon: {
-                QPolygon poly;
-                for (int k = 0; k < 5; ++k) {
-                    double a = -M_PI / 2.0 + k * (2.0 * M_PI / 5.0);
-                    poly << QPoint(int(x + w / 2 + (w / 2) * std::cos(a)), int(y + h / 2 + (h / 2) * std::sin(a)));
-                }
-                p.drawPolygon(poly);
-                break;
-            }
-            case ShapeType::Hexagon: {
-                QPolygon poly;
-                for (int k = 0; k < 6; ++k) {
-                    double a = k * (2.0 * M_PI / 6.0);
-                    poly << QPoint(int(x + w / 2 + (w / 2) * std::cos(a)), int(y + h / 2 + (h / 2) * std::sin(a)));
-                }
-                p.drawPolygon(poly);
-                break;
-            }
-            case ShapeType::RightArrow:
-                p.drawLine(x, y + h / 2, x + w, y + h / 2);
-                p.drawLine(x + w / 2, y, x + w, y + h / 2);
-                p.drawLine(x + w / 2, y + h, x + w, y + h / 2);
-                break;
-            case ShapeType::LeftArrow:
-                p.drawLine(x, y + h / 2, x + w, y + h / 2);
-                p.drawLine(x + w / 2, y, x, y + h / 2);
-                p.drawLine(x + w / 2, y + h, x, y + h / 2);
-                break;
-            case ShapeType::UpArrow:
-                p.drawLine(x + w / 2, y, x + w / 2, y + h);
-                p.drawLine(x, y + h / 2, x + w / 2, y);
-                p.drawLine(x + w, y + h / 2, x + w / 2, y);
-                break;
-            case ShapeType::DownArrow:
-                p.drawLine(x + w / 2, y, x + w / 2, y + h);
-                p.drawLine(x, y + h / 2, x + w / 2, y + h);
-                p.drawLine(x + w, y + h / 2, x + w / 2, y + h);
-                break;
-            case ShapeType::Star4:
-            case ShapeType::Star5:
-            case ShapeType::Star6:
-            case ShapeType::Heart:
-            case ShapeType::Lightning:
-            default:
-                p.drawRect(iconR);
-                break;
-        }
+        bool selected = (static_cast<int>(m_selectedShape) == i);
+        QPixmap thumb = PaintIcons::shapeThumbnail(static_cast<ShapeType>(i), r.width(), r.height(), selected);
+        p.drawPixmap(r.topLeft(), thumb);
     }
 
     // Label at bottom

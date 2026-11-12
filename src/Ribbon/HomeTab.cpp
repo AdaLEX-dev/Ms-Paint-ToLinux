@@ -1,4 +1,5 @@
 #include "HomeTab.h"
+#include "PaintIcons.h"
 #include <QHBoxLayout>
 #include <QVBoxLayout>
 #include <QGridLayout>
@@ -65,27 +66,16 @@ void HomeTab::setupClipboardGroup(QHBoxLayout* mainLayout) {
     btnPaste->setText("Paste");
     btnPaste->setToolButtonStyle(Qt::ToolButtonTextUnderIcon);
     btnPaste->setFixedSize(48, 55);
-
-    QPixmap pastePix(28, 28);
-    pastePix.fill(Qt::transparent);
-    QPainter pp(&pastePix);
-    pp.fillRect(6, 4, 16, 20, QColor(250, 240, 200));
-    pp.setPen(QColor(180, 160, 100));
-    pp.drawRect(6, 4, 16, 20);
-    pp.fillRect(4, 2, 12, 16, QColor(255, 255, 255));
-    pp.setPen(Qt::black);
-    pp.drawRect(4, 2, 12, 16);
-    pp.end();
-    btnPaste->setIcon(QIcon(pastePix));
+    btnPaste->setIcon(PaintIcons::pasteIcon(28));
     btnPaste->setIconSize(QSize(24, 24));
     btnPaste->setStyleSheet("QToolButton { background: transparent; border: 1px solid transparent; font-size: 10px; }"
                             "QToolButton:hover { background: #e5f1fb; border-color: #0078d7; }");
     connect(btnPaste, &QToolButton::clicked, this, &HomeTab::pasteTriggered);
 
     QMenu* pasteMenu = new QMenu(btnPaste);
-    QAction* actPaste = pasteMenu->addAction("Paste");
+    QAction* actPaste = pasteMenu->addAction(PaintIcons::pasteIcon(16), "Paste");
     connect(actPaste, &QAction::triggered, this, &HomeTab::pasteTriggered);
-    QAction* actPasteFrom = pasteMenu->addAction("Paste from...");
+    QAction* actPasteFrom = pasteMenu->addAction(PaintIcons::openIcon(16), "Paste from...");
     connect(actPasteFrom, &QAction::triggered, this, &HomeTab::pasteFromTriggered);
     btnPaste->setMenu(pasteMenu);
     btnPaste->setPopupMode(QToolButton::MenuButtonPopup);
@@ -97,6 +87,7 @@ void HomeTab::setupClipboardGroup(QHBoxLayout* mainLayout) {
 
     QToolButton* btnCut = new QToolButton(group);
     btnCut->setText("Cut");
+    btnCut->setIcon(PaintIcons::cutIcon(16));
     btnCut->setToolButtonStyle(Qt::ToolButtonTextBesideIcon);
     btnCut->setFixedHeight(24);
     btnCut->setStyleSheet("QToolButton { background: transparent; border: 1px solid transparent; font-size: 10px; }"
@@ -105,6 +96,7 @@ void HomeTab::setupClipboardGroup(QHBoxLayout* mainLayout) {
 
     QToolButton* btnCopy = new QToolButton(group);
     btnCopy->setText("Copy");
+    btnCopy->setIcon(PaintIcons::copyIcon(16));
     btnCopy->setToolButtonStyle(Qt::ToolButtonTextBesideIcon);
     btnCopy->setFixedHeight(24);
     btnCopy->setStyleSheet("QToolButton { background: transparent; border: 1px solid transparent; font-size: 10px; }"
@@ -139,28 +131,21 @@ void HomeTab::setupImageGroup(QHBoxLayout* mainLayout) {
     m_btnSelect->setText("Select");
     m_btnSelect->setToolButtonStyle(Qt::ToolButtonTextUnderIcon);
     m_btnSelect->setFixedSize(48, 55);
-
-    QPixmap selPix(24, 24);
-    selPix.fill(Qt::transparent);
-    QPainter sp(&selPix);
-    sp.setPen(QPen(Qt::blue, 1, Qt::DashLine));
-    sp.drawRect(2, 2, 20, 20);
-    sp.end();
-    m_btnSelect->setIcon(QIcon(selPix));
+    m_btnSelect->setIcon(PaintIcons::selectRectIcon(28));
     m_btnSelect->setIconSize(QSize(22, 22));
     m_btnSelect->setStyleSheet("QToolButton { background: transparent; border: 1px solid transparent; font-size: 10px; }"
                                "QToolButton:hover { background: #e5f1fb; border-color: #0078d7; }"
                                "QToolButton:checked { background: #cce4f7; border-color: #0078d7; }");
 
     QMenu* selMenu = new QMenu(m_btnSelect);
-    QAction* actRect = selMenu->addAction("Rectangular selection");
+    QAction* actRect = selMenu->addAction(PaintIcons::selectRectIcon(16), "Rectangular selection");
     connect(actRect, &QAction::triggered, this, [this]() { emit toolSelected(ActiveTool::SelectRect); });
-    QAction* actFree = selMenu->addAction("Free-form selection");
+    QAction* actFree = selMenu->addAction(PaintIcons::selectFreeformIcon(16), "Free-form selection");
     connect(actFree, &QAction::triggered, this, [this]() { emit toolSelected(ActiveTool::SelectFreeform); });
     selMenu->addSeparator();
-    QAction* actAll = selMenu->addAction("Select all (Ctrl+A)");
+    QAction* actAll = selMenu->addAction(PaintIcons::copyIcon(16), "Select all (Ctrl+A)");
     connect(actAll, &QAction::triggered, this, &HomeTab::selectAllTriggered);
-    QAction* actDel = selMenu->addAction("Delete (Del)");
+    QAction* actDel = selMenu->addAction(PaintIcons::exitIcon(16), "Delete (Del)");
     connect(actDel, &QAction::triggered, this, &HomeTab::deleteTriggered);
     selMenu->addSeparator();
     QAction* actTrans = selMenu->addAction("Transparent selection");
@@ -178,18 +163,24 @@ void HomeTab::setupImageGroup(QHBoxLayout* mainLayout) {
 
     QToolButton* btnCrop = new QToolButton(group);
     btnCrop->setText("Crop");
+    btnCrop->setIcon(PaintIcons::cropIcon(16));
+    btnCrop->setToolButtonStyle(Qt::ToolButtonTextBesideIcon);
     btnCrop->setFixedHeight(18);
     btnCrop->setStyleSheet("font-size: 10px; background: transparent; border: none;");
     connect(btnCrop, &QToolButton::clicked, this, &HomeTab::cropTriggered);
 
     QToolButton* btnResize = new QToolButton(group);
     btnResize->setText("Resize");
+    btnResize->setIcon(PaintIcons::resizeIcon(16));
+    btnResize->setToolButtonStyle(Qt::ToolButtonTextBesideIcon);
     btnResize->setFixedHeight(18);
     btnResize->setStyleSheet("font-size: 10px; background: transparent; border: none;");
     connect(btnResize, &QToolButton::clicked, this, &HomeTab::resizeAndSkewTriggered);
 
     QToolButton* btnRotate = new QToolButton(group);
     btnRotate->setText("Rotate");
+    btnRotate->setIcon(PaintIcons::rotateIcon(16));
+    btnRotate->setToolButtonStyle(Qt::ToolButtonTextBesideIcon);
     btnRotate->setFixedHeight(18);
     btnRotate->setPopupMode(QToolButton::InstantPopup);
     btnRotate->setStyleSheet("font-size: 10px; background: transparent; border: none;");
@@ -232,14 +223,16 @@ void HomeTab::setupToolsGroup(QHBoxLayout* mainLayout) {
     grid->setSpacing(2);
     grid->setContentsMargins(0, 0, 0, 0);
 
-    auto makeToolBtn = [group](const QString& text) {
+    auto makeToolBtn = [group](const QIcon& icon, const QString& tip) {
         QToolButton* b = new QToolButton(group);
-        b->setText(text);
+        b->setIcon(icon);
+        b->setIconSize(QSize(18, 18));
+        b->setToolTip(tip);
         b->setCheckable(true);
         b->setFixedSize(26, 26);
         b->setStyleSheet(
             "QToolButton {"
-            "  background: transparent; border: 1px solid transparent; border-radius: 2px; font-size: 11px; font-weight: bold;"
+            "  background: transparent; border: 1px solid transparent; border-radius: 2px;"
             "}"
             "QToolButton:hover { background: #e5f1fb; border-color: #0078d7; }"
             "QToolButton:checked { background: #cce4f7; border-color: #0078d7; }"
@@ -247,28 +240,22 @@ void HomeTab::setupToolsGroup(QHBoxLayout* mainLayout) {
         return b;
     };
 
-    m_btnPencil = makeToolBtn("✏️");
-    m_btnPencil->setToolTip("Pencil");
+    m_btnPencil = makeToolBtn(PaintIcons::pencilIcon(18), "Pencil");
     connect(m_btnPencil, &QToolButton::clicked, this, [this]() { emit toolSelected(ActiveTool::Pencil); });
 
-    m_btnFill = makeToolBtn("🪣");
-    m_btnFill->setToolTip("Fill with color");
+    m_btnFill = makeToolBtn(PaintIcons::fillIcon(18), "Fill with color");
     connect(m_btnFill, &QToolButton::clicked, this, [this]() { emit toolSelected(ActiveTool::Fill); });
 
-    m_btnText = makeToolBtn("A");
-    m_btnText->setToolTip("Text");
+    m_btnText = makeToolBtn(PaintIcons::textIcon(18), "Text");
     connect(m_btnText, &QToolButton::clicked, this, [this]() { emit toolSelected(ActiveTool::Text); });
 
-    m_btnEraser = makeToolBtn("🧹");
-    m_btnEraser->setToolTip("Eraser");
+    m_btnEraser = makeToolBtn(PaintIcons::eraserIcon(18), "Eraser");
     connect(m_btnEraser, &QToolButton::clicked, this, [this]() { emit toolSelected(ActiveTool::Eraser); });
 
-    m_btnPicker = makeToolBtn("💉");
-    m_btnPicker->setToolTip("Color picker");
+    m_btnPicker = makeToolBtn(PaintIcons::colorPickerIcon(18), "Color picker");
     connect(m_btnPicker, &QToolButton::clicked, this, [this]() { emit toolSelected(ActiveTool::ColorPicker); });
 
-    m_btnZoom = makeToolBtn("🔍");
-    m_btnZoom->setToolTip("Magnifier");
+    m_btnZoom = makeToolBtn(PaintIcons::magnifierIcon(18), "Magnifier");
     connect(m_btnZoom, &QToolButton::clicked, this, [this]() { emit toolSelected(ActiveTool::Magnifier); });
 
     grid->addWidget(m_btnPencil, 0, 0);

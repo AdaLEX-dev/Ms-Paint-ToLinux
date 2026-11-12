@@ -109,6 +109,8 @@ void MainWindow::setupUI() {
     connect(m_ribbonBar, &RibbonBar::openTriggered, this, &MainWindow::onOpen);
     connect(m_ribbonBar, &RibbonBar::saveTriggered, this, &MainWindow::onSave);
     connect(m_ribbonBar, &RibbonBar::saveAsTriggered, this, &MainWindow::onSaveAs);
+    connect(m_ribbonBar, &RibbonBar::undoTriggered, m_canvas, &PaintCanvas::undo);
+    connect(m_ribbonBar, &RibbonBar::redoTriggered, m_canvas, &PaintCanvas::redo);
     connect(m_ribbonBar, &RibbonBar::propertiesTriggered, this, &MainWindow::onProperties);
     connect(m_ribbonBar, &RibbonBar::aboutTriggered, this, &MainWindow::onAbout);
     connect(m_ribbonBar, &RibbonBar::exitTriggered, this, &MainWindow::close);

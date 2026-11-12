@@ -1,4 +1,5 @@
 #include "ViewTab.h"
+#include "PaintIcons.h"
 #include <QHBoxLayout>
 #include <QVBoxLayout>
 #include <QLabel>
@@ -32,6 +33,8 @@ ViewTab::ViewTab(QWidget* parent)
 
     QToolButton* btnZoomIn = new QToolButton(zoomGroup);
     btnZoomIn->setText("Zoom in");
+    btnZoomIn->setIcon(PaintIcons::zoomInIcon(28));
+    btnZoomIn->setIconSize(QSize(24, 24));
     btnZoomIn->setToolButtonStyle(Qt::ToolButtonTextUnderIcon);
     btnZoomIn->setFixedSize(50, 55);
     btnZoomIn->setStyleSheet("QToolButton { background: transparent; border: 1px solid transparent; font-size: 10px; }"
@@ -40,6 +43,8 @@ ViewTab::ViewTab(QWidget* parent)
 
     QToolButton* btnZoomOut = new QToolButton(zoomGroup);
     btnZoomOut->setText("Zoom out");
+    btnZoomOut->setIcon(PaintIcons::zoomOutIcon(28));
+    btnZoomOut->setIconSize(QSize(24, 24));
     btnZoomOut->setToolButtonStyle(Qt::ToolButtonTextUnderIcon);
     btnZoomOut->setFixedSize(50, 55);
     btnZoomOut->setStyleSheet("QToolButton { background: transparent; border: 1px solid transparent; font-size: 10px; }"
@@ -48,6 +53,8 @@ ViewTab::ViewTab(QWidget* parent)
 
     QToolButton* btn100 = new QToolButton(zoomGroup);
     btn100->setText("100%");
+    btn100->setIcon(PaintIcons::zoom100Icon(28));
+    btn100->setIconSize(QSize(24, 24));
     btn100->setToolButtonStyle(Qt::ToolButtonTextUnderIcon);
     btn100->setFixedSize(45, 55);
     btn100->setStyleSheet("QToolButton { background: transparent; border: 1px solid transparent; font-size: 10px; font-weight: bold; }"
@@ -110,6 +117,8 @@ ViewTab::ViewTab(QWidget* parent)
 
     QToolButton* btnFull = new QToolButton(dispGroup);
     btnFull->setText("Full screen");
+    btnFull->setIcon(PaintIcons::fullscreenIcon(28));
+    btnFull->setIconSize(QSize(24, 24));
     btnFull->setToolButtonStyle(Qt::ToolButtonTextUnderIcon);
     btnFull->setFixedSize(60, 55);
     btnFull->setStyleSheet("QToolButton { background: transparent; border: 1px solid transparent; font-size: 10px; }"
