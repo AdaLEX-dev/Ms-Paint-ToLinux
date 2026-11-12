@@ -7,31 +7,32 @@
 BrushGallery::BrushGallery(QWidget* parent)
     : QWidget(parent)
 {
-    setFixedSize(65, 85);
+    setFixedSize(60, 92);
 
     QVBoxLayout* layout = new QVBoxLayout(this);
-    layout->setContentsMargins(4, 4, 4, 2);
+    layout->setContentsMargins(2, 2, 2, 2);
     layout->setSpacing(2);
 
     m_button = new QToolButton(this);
     m_button->setText("Brushes");
     m_button->setToolButtonStyle(Qt::ToolButtonTextUnderIcon);
     m_button->setPopupMode(QToolButton::InstantPopup);
-    m_button->setFixedSize(55, 55);
+    m_button->setFixedSize(54, 66);
     m_button->setIcon(PaintIcons::brushesMainIcon(28));
     m_button->setIconSize(QSize(28, 28));
     m_button->setStyleSheet(
         "QToolButton {"
         "  background: transparent; border: 1px solid transparent; border-radius: 2px; font-size: 10px;"
         "}"
-        "QToolButton:hover { background: #e5f1fb; border-color: #0078d7; }"
-        "QToolButton:pressed, QToolButton:checked { background: #cce4f7; border-color: #0078d7; }"
+        "QToolButton:hover { background: #e5f1fb; border-color: #70c0e7; }"
+        "QToolButton:pressed, QToolButton:checked { background: #cce8ff; border-color: #3399ff; }"
     );
 
     setupMenu();
 
     QLabel* label = new QLabel("Brushes", this);
     label->setAlignment(Qt::AlignCenter);
+    label->setFixedHeight(14);
     label->setStyleSheet("color: #646464; font-size: 11px;");
 
     layout->addWidget(m_button, 0, Qt::AlignCenter);
@@ -40,6 +41,7 @@ BrushGallery::BrushGallery(QWidget* parent)
 
 void BrushGallery::setupMenu() {
     m_menu = new QMenu(this);
+    m_menu->setStyleSheet("QMenu { background: white; border: 1px solid #c0c0c0; font-size: 11px; } QMenu::item:selected { background: #e5f1fb; }");
 
     struct BrushInfo {
         BrushType type;

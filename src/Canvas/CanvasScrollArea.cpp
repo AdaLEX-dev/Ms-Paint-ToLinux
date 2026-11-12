@@ -52,7 +52,8 @@ CanvasScrollArea::CanvasScrollArea(PaintCanvas* canvas, QWidget* parent)
     setWidget(m_canvas);
     setWidgetResizable(false);
     setAlignment(Qt::AlignCenter);
-    setStyleSheet("QScrollArea { background-color: #e5e5e5; border: none; }");
+    viewport()->setStyleSheet("background-color: #e9ecf4;");
+    setStyleSheet("QScrollArea { background-color: #e9ecf4; border: none; }");
 
     m_topRuler = new RulerWidget(RulerWidget::Horizontal, this);
     m_leftRuler = new RulerWidget(RulerWidget::Vertical, this);

@@ -2,7 +2,8 @@
 
 #include <QWidget>
 #include <QPushButton>
-#include <QTabWidget>
+#include <QToolButton>
+#include <QStackedWidget>
 #include <QMenu>
 #include "HomeTab.h"
 #include "ViewTab.h"
@@ -17,6 +18,10 @@ public:
     ViewTab* viewTab() const { return m_viewTab; }
     QPushButton* fileButton() const { return m_fileButton; }
 
+public slots:
+    void selectHomeTab();
+    void selectViewTab();
+
 signals:
     void newTriggered();
     void openTriggered();
@@ -29,11 +34,18 @@ signals:
     void exitTriggered();
 
 private:
+    void setupUI();
     void setupFileMenu();
+    void updateTabStyles();
 
 private:
     QPushButton* m_fileButton = nullptr;
-    QTabWidget* m_tabWidget = nullptr;
+    QPushButton* m_homeTabBtn = nullptr;
+    QPushButton* m_viewTabBtn = nullptr;
+
+    QStackedWidget* m_stack = nullptr;
     HomeTab* m_homeTab = nullptr;
     ViewTab* m_viewTab = nullptr;
+
+    bool m_isHomeActive = true;
 };

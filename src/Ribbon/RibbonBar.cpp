@@ -2,37 +2,50 @@
 #include "PaintIcons.h"
 #include <QHBoxLayout>
 #include <QVBoxLayout>
-#include <QTabBar>
-#include <QToolButton>
+#include <QFrame>
 #include <QApplication>
 
 RibbonBar::RibbonBar(QWidget* parent)
     : QWidget(parent)
 {
-    setFixedHeight(128);
+    setFixedHeight(132);
+    setStyleSheet("background: #f5f6f7;");
+    setupUI();
+}
 
+void RibbonBar::setupUI() {
     QVBoxLayout* rootLayout = new QVBoxLayout(this);
     rootLayout->setContentsMargins(0, 0, 0, 0);
     rootLayout->setSpacing(0);
 
-    // Header bar with Quick Access + File button + Home/View tabs
+    // 1. Header Bar (Top Row: Quick Access + File + Tabs)
     QWidget* headerBar = new QWidget(this);
     headerBar->setFixedHeight(32);
     headerBar->setStyleSheet("background-color: #f5f6f7;");
 
     QHBoxLayout* hLayout = new QHBoxLayout(headerBar);
-    hLayout->setContentsMargins(4, 3, 4, 0);
-    hLayout->setSpacing(2);
+    hLayout->setContentsMargins(6, 3, 6, 0);
+    hLayout->setSpacing(3);
 
-    // Quick Access Toolbar
+    // App Icon
+    QToolButton* appBtn = new QToolButton(headerBar);
+    appBtn->setIcon(PaintIcons::appIcon(20));
+    appBtn->setIconSize(QSize(20, 20));
+    appBtn->setFixedSize(24, 24);
+    appBtn->setStyleSheet("background: transparent; border: none;");
+    hLayout->addWidget(appBtn);
+
+    // Quick Access Toolbar: Save, Undo, Redo
     auto makeQatBtn = [headerBar](const QIcon& icon, const QString& tip) {
         QToolButton* b = new QToolButton(headerBar);
         b->setIcon(icon);
         b->setIconSize(QSize(16, 16));
         b->setToolTip(tip);
         b->setFixedSize(24, 24);
-        b->setStyleSheet("QToolButton { background: transparent; border: 1px solid transparent; border-radius: 2px; }"
-                         "QToolButton:hover { background: #e5f1fb; border-color: #0078d7; }");
+        b->setStyleSheet(
+            "QToolButton { background: transparent; border: 1px solid transparent; border-radius: 2px; }"
+            "QToolButton:hover { background: #e5f1fb; border-color: #70c0e7; }"
+        );
         return b;
     };
 
@@ -48,38 +61,92 @@ RibbonBar::RibbonBar(QWidget* parent)
     connect(qatRedo, &QToolButton::clicked, this, &RibbonBar::redoTriggered);
     hLayout->addWidget(qatRedo);
 
+    // Separator line
+    QFrame* qatSep = new QFrame(headerBar);
+    qatSep->setFrameShape(QFrame::VLine);
+    qatSep->setFixedHeight(16);
+    qatSep->setStyleSheet("color: #d0d0d0;");
+    hLayout->addWidget(qatSep);
+
     // Blue Windows 10 "File" button
     m_fileButton = new QPushButton("File", headerBar);
-    m_fileButton->setFixedSize(56, 25);
+    m_fileButton->setFixedSize(56, 26);
     m_fileButton->setStyleSheet(
         "QPushButton {"
-        "  background-color: #0078d7; color: white; border: none; font-size: 11px; font-weight: bold; border-top-left-radius: 2px; border-top-right-radius: 2px; margin-left: 4px;"
+        "  background-color: #1979ca; color: white; border: none; font-size: 11px; font-weight: bold; border-top-left-radius: 2px; border-top-right-radius: 2px; margin-left: 2px;"
         "}"
-        "QPushButton:hover { background-color: #106ebe; }"
-        "QPushButton:pressed { background-color: #005a9e; }"
+        "QPushButton:hover { background-color: #1e88e5; }"
+        "QPushButton:pressed { background-color: #0f6ab4; }"
     );
     setupFileMenu();
     hLayout->addWidget(m_fileButton);
 
-    // Tab widget for Home and View
-    m_tabWidget = new QTabWidget(this);
-    m_tabWidget->setStyleSheet(
-        "QTabWidget::pane { border-top: 1px solid #dcdcdc; background: #fdfdfd; }"
-        "QTabBar::tab {"
-        "  background: #f5f6f7; border: 1px solid transparent; padding: 4px 16px; font-size: 11px; margin-left: 2px;"
-        "}"
-        "QTabBar::tab:hover { background: #e5f1fb; }"
-        "QTabBar::tab:selected { background: #fdfdfd; border-color: #dcdcdc; border-bottom-color: #fdfdfd; }"
-    );
+    // Windows 10 Tabs (Home & View)
+    m_homeTabBtn = new QPushButton("Home", headerBar);
+    m_homeTabBtn->setFixedSize(62, 26);
+    connect(m_homeTabBtn, &QPushButton::clicked, this, &RibbonBar::selectHomeTab);
+    hLayout->addWidget(m_homeTabBtn);
+
+    m_viewTabBtn = new QPushButton("View", headerBar);
+    m_viewTabBtn->setFixedSize(62, 26);
+    connect(m_viewTabBtn, &QPushButton::clicked, this, &RibbonBar::selectViewTab);
+    hLayout->addWidget(m_viewTabBtn);
+
+    hLayout->addStretch(1);
+    rootLayout->addWidget(headerBar);
+
+    // 2. Ribbon Content (StackedWidget: Home / View)
+    m_stack = new QStackedWidget(this);
+    m_stack->setFixedHeight(100);
+    m_stack->setStyleSheet("QStackedWidget { background: #ffffff; border-top: 1px solid #dcdcdc; border-bottom: 1px solid #dcdcdc; }");
 
     m_homeTab = new HomeTab(this);
     m_viewTab = new ViewTab(this);
 
-    m_tabWidget->addTab(m_homeTab, "Home");
-    m_tabWidget->addTab(m_viewTab, "View");
+    m_stack->addWidget(m_homeTab);
+    m_stack->addWidget(m_viewTab);
 
-    rootLayout->addWidget(headerBar);
-    rootLayout->addWidget(m_tabWidget);
+    rootLayout->addWidget(m_stack);
+
+    updateTabStyles();
+}
+
+void RibbonBar::selectHomeTab() {
+    m_isHomeActive = true;
+    m_stack->setCurrentIndex(0);
+    updateTabStyles();
+}
+
+void RibbonBar::selectViewTab() {
+    m_isHomeActive = false;
+    m_stack->setCurrentIndex(1);
+    updateTabStyles();
+}
+
+void RibbonBar::updateTabStyles() {
+    const QString activeStyle =
+        "QPushButton {"
+        "  background: #ffffff; color: #1979ca; font-size: 11px; font-weight: bold;"
+        "  border: 1px solid #dcdcdc; border-bottom: 1px solid #ffffff; border-top: 2px solid #1979ca;"
+        "  border-top-left-radius: 2px; border-top-right-radius: 2px;"
+        "}";
+
+    const QString inactiveStyle =
+        "QPushButton {"
+        "  background: transparent; color: #222222; font-size: 11px; font-weight: normal;"
+        "  border: 1px solid transparent; border-top-left-radius: 2px; border-top-right-radius: 2px;"
+        "}"
+        "QPushButton:hover {"
+        "  background: #e5f1fb; color: #000000;"
+        "}";
+
+    if (m_isHomeActive) {
+        m_homeTabBtn->setStyleSheet(activeStyle);
+        m_viewTabBtn->setStyleSheet(inactiveStyle);
+    } else {
+        m_homeTabBtn->setStyleSheet(inactiveStyle);
+        m_viewTabBtn->setStyleSheet(activeStyle);
+    }
 }
 
 void RibbonBar::setupFileMenu() {
@@ -88,8 +155,9 @@ void RibbonBar::setupFileMenu() {
         "QMenu {"
         "  background: white; border: 1px solid #c0c0c0; padding: 4px; font-size: 11px;"
         "}"
-        "QMenu::item { padding: 6px 24px; }"
-        "QMenu::item:selected { background: #e5f1fb; color: #000; }"
+        "QMenu::item { padding: 6px 24px; color: #000000; }"
+        "QMenu::item:selected { background: #e5f1fb; color: #000000; }"
+        "QMenu::separator { height: 1px; background: #e0e0e0; margin: 4px 0px; }"
     );
 
     QAction* actNew = menu->addAction(PaintIcons::newIcon(16), "New\tCtrl+N");
@@ -102,6 +170,7 @@ void RibbonBar::setupFileMenu() {
     connect(actSave, &QAction::triggered, this, &RibbonBar::saveTriggered);
 
     QMenu* saveAsMenu = menu->addMenu(PaintIcons::saveAsIcon(16), "Save as");
+    saveAsMenu->setStyleSheet(menu->styleSheet());
     QAction* saPNG = saveAsMenu->addAction("PNG picture");
     connect(saPNG, &QAction::triggered, this, [this]() { emit saveAsTriggered("PNG"); });
     QAction* saJPG = saveAsMenu->addAction("JPEG picture");

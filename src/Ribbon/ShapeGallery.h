@@ -1,7 +1,9 @@
 #pragma once
 
 #include <QWidget>
-#include <QComboBox>
+#include <QToolButton>
+#include <QMenu>
+#include <QVector>
 #include "../Tools/ToolTypes.h"
 
 class ShapeGallery : public QWidget {
@@ -14,23 +16,24 @@ public:
     ShapeStyle selectedOutline() const { return m_outlineStyle; }
     ShapeStyle selectedFill() const { return m_fillStyle; }
 
+public slots:
+    void setSelectedShape(ShapeType shape);
+
 signals:
     void shapeChanged(ShapeType shape);
     void outlineChanged(ShapeStyle style);
     void fillChanged(ShapeStyle style);
 
-protected:
-    void paintEvent(QPaintEvent* event) override;
-    void mousePressEvent(QMouseEvent* event) override;
-
 private:
-    QRect getShapeRect(int index) const;
+    void setupUI();
+    void updateButtons();
 
 private:
     ShapeType m_selectedShape = ShapeType::Line;
     ShapeStyle m_outlineStyle = ShapeStyle::Solid;
     ShapeStyle m_fillStyle = ShapeStyle::None;
 
-    QComboBox* m_outlineCombo = nullptr;
-    QComboBox* m_fillCombo = nullptr;
+    QVector<QToolButton*> m_shapeButtons;
+    QToolButton* m_outlineBtn = nullptr;
+    QToolButton* m_fillBtn = nullptr;
 };

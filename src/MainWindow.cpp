@@ -117,10 +117,15 @@ void MainWindow::setupUI() {
 
     // 3. Status Bar
     QStatusBar* bar = statusBar();
-    bar->setStyleSheet("QStatusBar { background: #f5f6f7; border-top: 1px solid #d8d8d8; font-size: 11px; }");
+    bar->setStyleSheet(
+        "QStatusBar { background: #f0f0f0; border-top: 1px solid #d8d8d8; font-size: 11px; color: #222222; min-height: 24px; }"
+        "QStatusBar QLabel { color: #222222; font-size: 11px; padding: 0px 4px; }"
+        "QSlider::groove:horizontal { height: 4px; background: #c0c0c0; border-radius: 2px; }"
+        "QSlider::handle:horizontal { background: #0078d7; width: 10px; margin-top: -3px; margin-bottom: -3px; border-radius: 5px; }"
+    );
 
     m_statusCoords = new QLabel("0, 0 px", this);
-    m_statusCoords->setFixedWidth(100);
+    m_statusCoords->setFixedWidth(110);
     bar->addWidget(m_statusCoords);
 
     m_statusSelection = new QLabel("", this);
@@ -128,7 +133,7 @@ void MainWindow::setupUI() {
     bar->addWidget(m_statusSelection);
 
     m_statusSize = new QLabel(QString("%1 x %2 px").arg(m_canvas->imageSize().width()).arg(m_canvas->imageSize().height()), this);
-    m_statusSize->setFixedWidth(120);
+    m_statusSize->setFixedWidth(130);
     bar->addWidget(m_statusSize);
 
     // Zoom Controls in Status Bar

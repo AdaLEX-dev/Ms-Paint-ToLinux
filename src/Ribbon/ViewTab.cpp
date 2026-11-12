@@ -9,56 +9,54 @@ static QFrame* createSeparator() {
     QFrame* line = new QFrame();
     line->setFrameShape(QFrame::VLine);
     line->setFrameShadow(QFrame::Plain);
-    line->setStyleSheet("color: #d8d8d8;");
+    line->setFixedHeight(76);
+    line->setStyleSheet("QFrame { background: #e5e5e5; border: none; max-width: 1px; min-width: 1px; margin: 4px 2px; }");
     return line;
 }
 
 ViewTab::ViewTab(QWidget* parent)
     : QWidget(parent)
 {
-    setFixedHeight(95);
+    setFixedHeight(100);
+    setStyleSheet("background: #ffffff;");
 
     QHBoxLayout* mainLayout = new QHBoxLayout(this);
-    mainLayout->setContentsMargins(6, 4, 6, 4);
-    mainLayout->setSpacing(6);
+    mainLayout->setContentsMargins(6, 2, 6, 2);
+    mainLayout->setSpacing(4);
 
     // 1. Zoom Group
     QWidget* zoomGroup = new QWidget(this);
+    zoomGroup->setFixedSize(168, 92);
     QVBoxLayout* zLayout = new QVBoxLayout(zoomGroup);
-    zLayout->setContentsMargins(0, 0, 0, 0);
+    zLayout->setContentsMargins(2, 2, 2, 2);
     zLayout->setSpacing(2);
 
     QHBoxLayout* zBtns = new QHBoxLayout();
-    zBtns->setSpacing(4);
+    zBtns->setContentsMargins(0, 0, 0, 0);
+    zBtns->setSpacing(3);
 
-    QToolButton* btnZoomIn = new QToolButton(zoomGroup);
-    btnZoomIn->setText("Zoom in");
-    btnZoomIn->setIcon(PaintIcons::zoomInIcon(28));
-    btnZoomIn->setIconSize(QSize(24, 24));
-    btnZoomIn->setToolButtonStyle(Qt::ToolButtonTextUnderIcon);
-    btnZoomIn->setFixedSize(50, 55);
-    btnZoomIn->setStyleSheet("QToolButton { background: transparent; border: 1px solid transparent; font-size: 10px; }"
-                             "QToolButton:hover { background: #e5f1fb; border-color: #0078d7; }");
+    auto makeZoomBtn = [zoomGroup](const QIcon& icon, const QString& text, int w) {
+        QToolButton* b = new QToolButton(zoomGroup);
+        b->setText(text);
+        b->setIcon(icon);
+        b->setIconSize(QSize(28, 28));
+        b->setToolButtonStyle(Qt::ToolButtonTextUnderIcon);
+        b->setFixedSize(w, 66);
+        b->setStyleSheet(
+            "QToolButton { background: transparent; border: 1px solid transparent; border-radius: 2px; font-size: 10px; }"
+            "QToolButton:hover { background: #e5f1fb; border-color: #70c0e7; }"
+            "QToolButton:pressed { background: #cce8ff; }"
+        );
+        return b;
+    };
+
+    QToolButton* btnZoomIn = makeZoomBtn(PaintIcons::zoomInIcon(28), "Zoom in", 52);
     connect(btnZoomIn, &QToolButton::clicked, this, &ViewTab::zoomInTriggered);
 
-    QToolButton* btnZoomOut = new QToolButton(zoomGroup);
-    btnZoomOut->setText("Zoom out");
-    btnZoomOut->setIcon(PaintIcons::zoomOutIcon(28));
-    btnZoomOut->setIconSize(QSize(24, 24));
-    btnZoomOut->setToolButtonStyle(Qt::ToolButtonTextUnderIcon);
-    btnZoomOut->setFixedSize(50, 55);
-    btnZoomOut->setStyleSheet("QToolButton { background: transparent; border: 1px solid transparent; font-size: 10px; }"
-                              "QToolButton:hover { background: #e5f1fb; border-color: #0078d7; }");
+    QToolButton* btnZoomOut = makeZoomBtn(PaintIcons::zoomOutIcon(28), "Zoom out", 52);
     connect(btnZoomOut, &QToolButton::clicked, this, &ViewTab::zoomOutTriggered);
 
-    QToolButton* btn100 = new QToolButton(zoomGroup);
-    btn100->setText("100%");
-    btn100->setIcon(PaintIcons::zoom100Icon(28));
-    btn100->setIconSize(QSize(24, 24));
-    btn100->setToolButtonStyle(Qt::ToolButtonTextUnderIcon);
-    btn100->setFixedSize(45, 55);
-    btn100->setStyleSheet("QToolButton { background: transparent; border: 1px solid transparent; font-size: 10px; font-weight: bold; }"
-                          "QToolButton:hover { background: #e5f1fb; border-color: #0078d7; }");
+    QToolButton* btn100 = makeZoomBtn(PaintIcons::zoom100Icon(28), "100%", 52);
     connect(btn100, &QToolButton::clicked, this, &ViewTab::zoom100Triggered);
 
     zBtns->addWidget(btnZoomIn);
@@ -67,6 +65,7 @@ ViewTab::ViewTab(QWidget* parent)
 
     QLabel* zLabel = new QLabel("Zoom", zoomGroup);
     zLabel->setAlignment(Qt::AlignCenter);
+    zLabel->setFixedHeight(14);
     zLabel->setStyleSheet("color: #646464; font-size: 11px;");
 
     zLayout->addLayout(zBtns);
@@ -76,24 +75,26 @@ ViewTab::ViewTab(QWidget* parent)
 
     // 2. Show or hide Group
     QWidget* showGroup = new QWidget(this);
+    showGroup->setFixedSize(110, 92);
     QVBoxLayout* sLayout = new QVBoxLayout(showGroup);
-    sLayout->setContentsMargins(0, 0, 0, 0);
+    sLayout->setContentsMargins(4, 2, 4, 2);
     sLayout->setSpacing(2);
 
     QVBoxLayout* checks = new QVBoxLayout();
-    checks->setSpacing(2);
+    checks->setContentsMargins(4, 4, 4, 0);
+    checks->setSpacing(4);
 
     m_checkRulers = new QCheckBox("Rulers", showGroup);
-    m_checkRulers->setStyleSheet("font-size: 11px;");
+    m_checkRulers->setStyleSheet("QCheckBox { font-size: 11px; color: #333333; }");
     connect(m_checkRulers, &QCheckBox::toggled, this, &ViewTab::rulersToggled);
 
     m_checkGrid = new QCheckBox("Gridlines", showGroup);
-    m_checkGrid->setStyleSheet("font-size: 11px;");
+    m_checkGrid->setStyleSheet("QCheckBox { font-size: 11px; color: #333333; }");
     connect(m_checkGrid, &QCheckBox::toggled, this, &ViewTab::gridlinesToggled);
 
     m_checkStatus = new QCheckBox("Status bar", showGroup);
     m_checkStatus->setChecked(true);
-    m_checkStatus->setStyleSheet("font-size: 11px;");
+    m_checkStatus->setStyleSheet("QCheckBox { font-size: 11px; color: #333333; }");
     connect(m_checkStatus, &QCheckBox::toggled, this, &ViewTab::statusBarToggled);
 
     checks->addWidget(m_checkRulers);
@@ -102,6 +103,7 @@ ViewTab::ViewTab(QWidget* parent)
 
     QLabel* sLabel = new QLabel("Show or hide", showGroup);
     sLabel->setAlignment(Qt::AlignCenter);
+    sLabel->setFixedHeight(14);
     sLabel->setStyleSheet("color: #646464; font-size: 11px;");
 
     sLayout->addLayout(checks);
@@ -111,22 +113,27 @@ ViewTab::ViewTab(QWidget* parent)
 
     // 3. Display Group
     QWidget* dispGroup = new QWidget(this);
+    dispGroup->setFixedSize(70, 92);
     QVBoxLayout* dLayout = new QVBoxLayout(dispGroup);
-    dLayout->setContentsMargins(0, 0, 0, 0);
+    dLayout->setContentsMargins(2, 2, 2, 2);
     dLayout->setSpacing(2);
 
     QToolButton* btnFull = new QToolButton(dispGroup);
     btnFull->setText("Full screen");
     btnFull->setIcon(PaintIcons::fullscreenIcon(28));
-    btnFull->setIconSize(QSize(24, 24));
+    btnFull->setIconSize(QSize(28, 28));
     btnFull->setToolButtonStyle(Qt::ToolButtonTextUnderIcon);
-    btnFull->setFixedSize(60, 55);
-    btnFull->setStyleSheet("QToolButton { background: transparent; border: 1px solid transparent; font-size: 10px; }"
-                           "QToolButton:hover { background: #e5f1fb; border-color: #0078d7; }");
+    btnFull->setFixedSize(62, 66);
+    btnFull->setStyleSheet(
+        "QToolButton { background: transparent; border: 1px solid transparent; border-radius: 2px; font-size: 10px; }"
+        "QToolButton:hover { background: #e5f1fb; border-color: #70c0e7; }"
+        "QToolButton:pressed { background: #cce8ff; }"
+    );
     connect(btnFull, &QToolButton::clicked, this, &ViewTab::fullScreenTriggered);
 
     QLabel* dLabel = new QLabel("Display", dispGroup);
     dLabel->setAlignment(Qt::AlignCenter);
+    dLabel->setFixedHeight(14);
     dLabel->setStyleSheet("color: #646464; font-size: 11px;");
 
     dLayout->addWidget(btnFull, 0, Qt::AlignCenter);

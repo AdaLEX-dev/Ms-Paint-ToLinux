@@ -1,15 +1,16 @@
 #include "ColorPalette.h"
-#include <QPainter>
-#include <QMouseEvent>
-#include <QColorDialog>
+#include "PaintIcons.h"
 #include <QHBoxLayout>
 #include <QVBoxLayout>
-#include <QLabel>
+#include <QGridLayout>
+#include <QColorDialog>
+#include <QMouseEvent>
+#include <QPainter>
 
 ColorPalette::ColorPalette(QWidget* parent)
     : QWidget(parent)
 {
-    setFixedSize(290, 85);
+    setFixedSize(320, 92);
 
     // Exact Windows 10 Default Color Palette (Row 1)
     m_row1 = {
@@ -25,7 +26,7 @@ ColorPalette::ColorPalette(QWidget* parent)
         QColor(163, 73, 164)    // Purple
     };
 
-    // Row 2
+    // Row 2: Secondary / Pastel
     m_row2 = {
         QColor(255, 255, 255),  // White
         QColor(195, 195, 195),  // Light Gray
@@ -42,43 +43,193 @@ ColorPalette::ColorPalette(QWidget* parent)
     // Row 3: 10 Custom slots
     m_row3.fill(QColor(255, 255, 255), 10);
 
-    // Edit Colors Button
-    m_editColorsBtn = new QPushButton("Edit\ncolors", this);
-    m_editColorsBtn->setGeometry(235, 10, 48, 55);
+    setupUI();
+    updatePreviews();
+}
+
+void ColorPalette::setupUI() {
+    QVBoxLayout* rootLayout = new QVBoxLayout(this);
+    rootLayout->setContentsMargins(2, 2, 2, 2);
+    rootLayout->setSpacing(2);
+
+    QHBoxLayout* topLayout = new QHBoxLayout();
+    topLayout->setContentsMargins(0, 0, 0, 0);
+    topLayout->setSpacing(4);
+
+    // 1. Dual Color Cards (Color 1 & Color 2)
+    auto createColorCard = [this](const QString& name, QLabel*& swatchLabel) {
+        QWidget* card = new QWidget(this);
+        card->setFixedSize(34, 66);
+        QVBoxLayout* cLayout = new QVBoxLayout(card);
+        cLayout->setContentsMargins(2, 2, 2, 2);
+        cLayout->setSpacing(2);
+
+        QLabel* textLabel = new QLabel(name, card);
+        textLabel->setAlignment(Qt::AlignCenter);
+        textLabel->setStyleSheet("font-size: 9px; font-weight: bold; color: #333333;");
+
+        swatchLabel = new QLabel(card);
+        swatchLabel->setFixedSize(26, 26);
+        swatchLabel->setStyleSheet("background: #000000; border: 1px solid #707070;");
+
+        cLayout->addWidget(textLabel);
+        cLayout->addWidget(swatchLabel, 0, Qt::AlignCenter);
+        cLayout->addStretch(1);
+        return card;
+    };
+
+    m_card1 = createColorCard("Color\n1", m_swatchPreview1);
+    m_card2 = createColorCard("Color\n2", m_swatchPreview2);
+
+    // Click on Card 1
+    m_card1->installEventFilter(this);
+    m_card2->installEventFilter(this);
+
+    topLayout->addWidget(m_card1);
+    topLayout->addWidget(m_card2);
+
+    // 2. Swatches Palette Grid (3 rows x 10 cols)
+    QWidget* swatchGridWidget = new QWidget(this);
+    QGridLayout* sGrid = new QGridLayout(swatchGridWidget);
+    sGrid->setContentsMargins(2, 2, 2, 2);
+    sGrid->setSpacing(2);
+
+    auto addSwatchRow = [this, sGrid](const QVector<QColor>& colors, int row, bool isCustom) {
+        for (int col = 0; col < 10; ++col) {
+            QToolButton* btn = new QToolButton(this);
+            btn->setFixedSize(14, 14);
+            QColor c = colors[col];
+            btn->setStyleSheet(QString("QToolButton { background-color: %1; border: 1px solid #999999; border-radius: 1px; }"
+                                       "QToolButton:hover { border: 1px solid #0078d7; }").arg(c.name()));
+
+            connect(btn, &QToolButton::clicked, this, [this, btn]() {
+                // Get color from style or attribute
+                QColor c = btn->palette().button().color();
+                // extract from stylesheet
+                QString ss = btn->styleSheet();
+                int idx = ss.indexOf("background-color: ");
+                if (idx != -1) {
+                    QString hex = ss.mid(idx + 18, 7);
+                    c = QColor(hex);
+                }
+
+                if (m_editingColor1) {
+                    setColor1(c);
+                } else {
+                    setColor2(c);
+                }
+            });
+
+            if (isCustom) {
+                m_customButtons.append(btn);
+            }
+            sGrid->addWidget(btn, row, col);
+        }
+    };
+
+    addSwatchRow(m_row1, 0, false);
+    addSwatchRow(m_row2, 1, false);
+    addSwatchRow(m_row3, 2, true);
+
+    topLayout->addWidget(swatchGridWidget);
+
+    // 3. Edit Colors Button
+    m_editColorsBtn = new QToolButton(this);
+    m_editColorsBtn->setFixedSize(48, 66);
+    m_editColorsBtn->setText("Edit\ncolors");
+    m_editColorsBtn->setToolButtonStyle(Qt::ToolButtonTextUnderIcon);
+
+    // Custom color circle icon
+    QPixmap wheelPix(24, 24);
+    wheelPix.fill(Qt::transparent);
+    QPainter wp(&wheelPix);
+    wp.setRenderHint(QPainter::Antialiasing, true);
+    for (int i = 0; i < 360; i += 30) {
+        wp.setPen(Qt::NoPen);
+        wp.setBrush(QColor::fromHsv(i, 220, 240));
+        wp.drawPie(QRectF(1, 1, 22, 22), i * 16, 30 * 16);
+    }
+    wp.setBrush(Qt::white);
+    wp.drawEllipse(QRectF(6, 6, 12, 12));
+    wp.end();
+
+    m_editColorsBtn->setIcon(QIcon(wheelPix));
+    m_editColorsBtn->setIconSize(QSize(24, 24));
     m_editColorsBtn->setStyleSheet(
-        "QPushButton {"
-        "  background: #fdfdfd; border: 1px solid #c0c0c0; border-radius: 2px; font-size: 11px;"
-        "}"
-        "QPushButton:hover { background: #e5f1fb; border-color: #0078d7; }"
-        "QPushButton:pressed { background: #cce4f7; }"
+        "QToolButton { background: transparent; border: 1px solid transparent; border-radius: 2px; font-size: 10px; }"
+        "QToolButton:hover { background: #e5f1fb; border-color: #70c0e7; }"
+        "QToolButton:pressed { background: #cce8ff; }"
     );
-    connect(m_editColorsBtn, &QPushButton::clicked, this, &ColorPalette::onEditColorsClicked);
+    connect(m_editColorsBtn, &QToolButton::clicked, this, &ColorPalette::onEditColorsClicked);
+    topLayout->addWidget(m_editColorsBtn);
+
+    rootLayout->addLayout(topLayout);
+
+    // Group Label
+    QLabel* groupLabel = new QLabel("Colors", this);
+    groupLabel->setAlignment(Qt::AlignCenter);
+    groupLabel->setFixedHeight(14);
+    groupLabel->setStyleSheet("color: #646464; font-size: 11px;");
+    rootLayout->addWidget(groupLabel);
+}
+
+void ColorPalette::selectColor1Mode() {
+    m_editingColor1 = true;
+    updatePreviews();
+}
+
+void ColorPalette::selectColor2Mode() {
+    m_editingColor1 = false;
+    updatePreviews();
+}
+
+bool ColorPalette::eventFilter(QObject* watched, QEvent* event) {
+    if (event->type() == QEvent::MouseButtonPress) {
+        if (watched == m_card1) {
+            selectColor1Mode();
+            return true;
+        } else if (watched == m_card2) {
+            selectColor2Mode();
+            return true;
+        }
+    }
+    return QWidget::eventFilter(watched, event);
 }
 
 void ColorPalette::setColor1(const QColor& c) {
     m_color1 = c;
-    update();
+    updatePreviews();
+    emit color1Changed(c);
 }
 
 void ColorPalette::setColor2(const QColor& c) {
     m_color2 = c;
-    update();
+    updatePreviews();
+    emit color2Changed(c);
 }
 
-QRect ColorPalette::getColor1Rect() const {
-    return QRect(5, 10, 32, 45);
-}
+void ColorPalette::updatePreviews() {
+    if (m_swatchPreview1) {
+        m_swatchPreview1->setStyleSheet(QString("background-color: %1; border: 1px solid #707070;").arg(m_color1.name()));
+    }
+    if (m_swatchPreview2) {
+        m_swatchPreview2->setStyleSheet(QString("background-color: %1; border: 1px solid #707070;").arg(m_color2.name()));
+    }
 
-QRect ColorPalette::getColor2Rect() const {
-    return QRect(42, 10, 32, 45);
-}
-
-QRect ColorPalette::getSwatchRect(int row, int col) const {
-    int startX = 82;
-    int startY = 12;
-    int size = 13;
-    int gap = 2;
-    return QRect(startX + col * (size + gap), startY + row * (size + gap), size, size);
+    if (m_card1) {
+        if (m_editingColor1) {
+            m_card1->setStyleSheet("QWidget { background: #cce8ff; border: 1px solid #3399ff; border-radius: 2px; }");
+        } else {
+            m_card1->setStyleSheet("QWidget { background: transparent; border: 1px solid transparent; } QWidget:hover { background: #e5f1fb; }");
+        }
+    }
+    if (m_card2) {
+        if (!m_editingColor1) {
+            m_card2->setStyleSheet("QWidget { background: #cce8ff; border: 1px solid #3399ff; border-radius: 2px; }");
+        } else {
+            m_card2->setStyleSheet("QWidget { background: transparent; border: 1px solid transparent; } QWidget:hover { background: #e5f1fb; }");
+        }
+    }
 }
 
 void ColorPalette::onEditColorsClicked() {
@@ -86,107 +237,18 @@ void ColorPalette::onEditColorsClicked() {
     QColor picked = QColorDialog::getColor(current, this, "Edit Colors", QColorDialog::ShowAlphaChannel);
     if (picked.isValid()) {
         if (m_editingColor1) {
-            m_color1 = picked;
-            emit color1Changed(picked);
+            setColor1(picked);
         } else {
-            m_color2 = picked;
-            emit color2Changed(picked);
+            setColor2(picked);
         }
 
-        // Add to first empty or shift custom colors
+        // Shift custom color into custom palette
         m_row3.pop_back();
         m_row3.prepend(picked);
-        update();
-    }
-}
 
-void ColorPalette::paintEvent(QPaintEvent* event) {
-    QPainter p(this);
-    p.setRenderHint(QPainter::Antialiasing, false);
-
-    // 1. Draw Color 1 Box
-    QRect r1 = getColor1Rect();
-    if (m_editingColor1) {
-        p.fillRect(r1.adjusted(-2, -2, 2, 2), QColor(204, 232, 255));
-        p.setPen(QColor(0, 120, 215));
-        p.drawRect(r1.adjusted(-2, -2, 2, 2));
-    }
-    p.fillRect(QRect(r1.x() + 3, r1.y() + 3, 26, 26), m_color1);
-    p.setPen(QColor(160, 160, 160));
-    p.drawRect(QRect(r1.x() + 3, r1.y() + 3, 26, 26));
-    p.setPen(Qt::black);
-    QFont f = p.font();
-    f.setPointSize(8);
-    p.setFont(f);
-    p.drawText(QRect(r1.x(), r1.bottom() - 12, r1.width(), 12), Qt::AlignCenter, "Color 1");
-
-    // 2. Draw Color 2 Box
-    QRect r2 = getColor2Rect();
-    if (!m_editingColor1) {
-        p.fillRect(r2.adjusted(-2, -2, 2, 2), QColor(204, 232, 255));
-        p.setPen(QColor(0, 120, 215));
-        p.drawRect(r2.adjusted(-2, -2, 2, 2));
-    }
-    p.fillRect(QRect(r2.x() + 3, r2.y() + 3, 26, 26), m_color2);
-    p.setPen(QColor(160, 160, 160));
-    p.drawRect(QRect(r2.x() + 3, r2.y() + 3, 26, 26));
-    p.setPen(Qt::black);
-    p.drawText(QRect(r2.x(), r2.bottom() - 12, r2.width(), 12), Qt::AlignCenter, "Color 2");
-
-    // 3. Draw 30 Color Swatches
-    for (int col = 0; col < 10; ++col) {
-        // Row 1
-        QRect sw1 = getSwatchRect(0, col);
-        p.fillRect(sw1, m_row1[col]);
-        p.setPen(QColor(180, 180, 180));
-        p.drawRect(sw1);
-
-        // Row 2
-        QRect sw2 = getSwatchRect(1, col);
-        p.fillRect(sw2, m_row2[col]);
-        p.setPen(QColor(180, 180, 180));
-        p.drawRect(sw2);
-
-        // Row 3
-        QRect sw3 = getSwatchRect(2, col);
-        p.fillRect(sw3, m_row3[col]);
-        p.setPen(QColor(200, 200, 200));
-        p.drawRect(sw3);
-    }
-
-    // Label at bottom
-    p.setPen(QColor(100, 100, 100));
-    p.drawText(QRect(0, 70, width(), 14), Qt::AlignCenter, "Colors");
-}
-
-void ColorPalette::mousePressEvent(QMouseEvent* event) {
-    if (getColor1Rect().contains(event->pos())) {
-        m_editingColor1 = true;
-        update();
-        return;
-    }
-    if (getColor2Rect().contains(event->pos())) {
-        m_editingColor1 = false;
-        update();
-        return;
-    }
-
-    // Check click on 30 swatches
-    for (int r = 0; r < 3; ++r) {
-        for (int c = 0; c < 10; ++c) {
-            QRect sw = getSwatchRect(r, c);
-            if (sw.contains(event->pos())) {
-                QColor sel = (r == 0) ? m_row1[c] : ((r == 1) ? m_row2[c] : m_row3[c]);
-                if (event->button() == Qt::RightButton || !m_editingColor1) {
-                    m_color2 = sel;
-                    emit color2Changed(sel);
-                } else {
-                    m_color1 = sel;
-                    emit color1Changed(sel);
-                }
-                update();
-                return;
-            }
+        for (int i = 0; i < m_customButtons.size() && i < m_row3.size(); ++i) {
+            m_customButtons[i]->setStyleSheet(QString("QToolButton { background-color: %1; border: 1px solid #999999; border-radius: 1px; }"
+                                                      "QToolButton:hover { border: 1px solid #0078d7; }").arg(m_row3[i].name()));
         }
     }
 }

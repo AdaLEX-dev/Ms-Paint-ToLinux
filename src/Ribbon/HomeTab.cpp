@@ -5,24 +5,25 @@
 #include <QGridLayout>
 #include <QLabel>
 #include <QFrame>
-#include <QPainter>
 
 static QFrame* createSeparator() {
     QFrame* line = new QFrame();
     line->setFrameShape(QFrame::VLine);
     line->setFrameShadow(QFrame::Plain);
-    line->setStyleSheet("color: #d8d8d8;");
+    line->setFixedHeight(76);
+    line->setStyleSheet("QFrame { background: #e5e5e5; border: none; max-width: 1px; min-width: 1px; margin: 4px 2px; }");
     return line;
 }
 
 HomeTab::HomeTab(QWidget* parent)
     : QWidget(parent)
 {
-    setFixedHeight(95);
+    setFixedHeight(100);
+    setStyleSheet("background: #ffffff;");
 
     QHBoxLayout* mainLayout = new QHBoxLayout(this);
-    mainLayout->setContentsMargins(6, 4, 6, 4);
-    mainLayout->setSpacing(6);
+    mainLayout->setContentsMargins(6, 2, 6, 2);
+    mainLayout->setSpacing(4);
 
     setupClipboardGroup(mainLayout);
     mainLayout->addWidget(createSeparator());
@@ -53,26 +54,31 @@ HomeTab::HomeTab(QWidget* parent)
 
 void HomeTab::setupClipboardGroup(QHBoxLayout* mainLayout) {
     QWidget* group = new QWidget(this);
+    group->setFixedSize(112, 92);
     QVBoxLayout* gLayout = new QVBoxLayout(group);
-    gLayout->setContentsMargins(0, 0, 0, 0);
+    gLayout->setContentsMargins(2, 2, 2, 2);
     gLayout->setSpacing(2);
 
     QHBoxLayout* btnLayout = new QHBoxLayout();
     btnLayout->setContentsMargins(0, 0, 0, 0);
-    btnLayout->setSpacing(2);
+    btnLayout->setSpacing(3);
 
     // Large Paste Button
     QToolButton* btnPaste = new QToolButton(group);
     btnPaste->setText("Paste");
-    btnPaste->setToolButtonStyle(Qt::ToolButtonTextUnderIcon);
-    btnPaste->setFixedSize(48, 55);
     btnPaste->setIcon(PaintIcons::pasteIcon(28));
-    btnPaste->setIconSize(QSize(24, 24));
-    btnPaste->setStyleSheet("QToolButton { background: transparent; border: 1px solid transparent; font-size: 10px; }"
-                            "QToolButton:hover { background: #e5f1fb; border-color: #0078d7; }");
+    btnPaste->setIconSize(QSize(28, 28));
+    btnPaste->setToolButtonStyle(Qt::ToolButtonTextUnderIcon);
+    btnPaste->setFixedSize(48, 66);
+    btnPaste->setStyleSheet(
+        "QToolButton { background: transparent; border: 1px solid transparent; border-radius: 2px; font-size: 10px; }"
+        "QToolButton:hover { background: #e5f1fb; border-color: #70c0e7; }"
+        "QToolButton:pressed { background: #cce8ff; }"
+    );
     connect(btnPaste, &QToolButton::clicked, this, &HomeTab::pasteTriggered);
 
     QMenu* pasteMenu = new QMenu(btnPaste);
+    pasteMenu->setStyleSheet("QMenu { background: white; border: 1px solid #c0c0c0; font-size: 11px; } QMenu::item:selected { background: #e5f1fb; }");
     QAction* actPaste = pasteMenu->addAction(PaintIcons::pasteIcon(16), "Paste");
     connect(actPaste, &QAction::triggered, this, &HomeTab::pasteTriggered);
     QAction* actPasteFrom = pasteMenu->addAction(PaintIcons::openIcon(16), "Paste from...");
@@ -83,32 +89,38 @@ void HomeTab::setupClipboardGroup(QHBoxLayout* mainLayout) {
     btnLayout->addWidget(btnPaste);
 
     QVBoxLayout* smallBtns = new QVBoxLayout();
+    smallBtns->setContentsMargins(0, 0, 0, 0);
     smallBtns->setSpacing(2);
 
-    QToolButton* btnCut = new QToolButton(group);
-    btnCut->setText("Cut");
-    btnCut->setIcon(PaintIcons::cutIcon(16));
-    btnCut->setToolButtonStyle(Qt::ToolButtonTextBesideIcon);
-    btnCut->setFixedHeight(24);
-    btnCut->setStyleSheet("QToolButton { background: transparent; border: 1px solid transparent; font-size: 10px; }"
-                          "QToolButton:hover { background: #e5f1fb; border-color: #0078d7; }");
+    auto makeSmallBtn = [group](const QIcon& icon, const QString& text) {
+        QToolButton* b = new QToolButton(group);
+        b->setText(text);
+        b->setIcon(icon);
+        b->setIconSize(QSize(16, 16));
+        b->setToolButtonStyle(Qt::ToolButtonTextBesideIcon);
+        b->setFixedSize(56, 20);
+        b->setStyleSheet(
+            "QToolButton { background: transparent; border: 1px solid transparent; border-radius: 2px; font-size: 10px; text-align: left; padding-left: 2px; }"
+            "QToolButton:hover { background: #e5f1fb; border-color: #70c0e7; }"
+            "QToolButton:pressed { background: #cce8ff; }"
+        );
+        return b;
+    };
+
+    QToolButton* btnCut = makeSmallBtn(PaintIcons::cutIcon(16), "Cut");
     connect(btnCut, &QToolButton::clicked, this, &HomeTab::cutTriggered);
 
-    QToolButton* btnCopy = new QToolButton(group);
-    btnCopy->setText("Copy");
-    btnCopy->setIcon(PaintIcons::copyIcon(16));
-    btnCopy->setToolButtonStyle(Qt::ToolButtonTextBesideIcon);
-    btnCopy->setFixedHeight(24);
-    btnCopy->setStyleSheet("QToolButton { background: transparent; border: 1px solid transparent; font-size: 10px; }"
-                           "QToolButton:hover { background: #e5f1fb; border-color: #0078d7; }");
+    QToolButton* btnCopy = makeSmallBtn(PaintIcons::copyIcon(16), "Copy");
     connect(btnCopy, &QToolButton::clicked, this, &HomeTab::copyTriggered);
 
     smallBtns->addWidget(btnCut);
     smallBtns->addWidget(btnCopy);
+    smallBtns->addStretch(1);
     btnLayout->addLayout(smallBtns);
 
     QLabel* label = new QLabel("Clipboard", group);
     label->setAlignment(Qt::AlignCenter);
+    label->setFixedHeight(14);
     label->setStyleSheet("color: #646464; font-size: 11px;");
 
     gLayout->addLayout(btnLayout);
@@ -118,26 +130,30 @@ void HomeTab::setupClipboardGroup(QHBoxLayout* mainLayout) {
 
 void HomeTab::setupImageGroup(QHBoxLayout* mainLayout) {
     QWidget* group = new QWidget(this);
+    group->setFixedSize(128, 92);
     QVBoxLayout* gLayout = new QVBoxLayout(group);
-    gLayout->setContentsMargins(0, 0, 0, 0);
+    gLayout->setContentsMargins(2, 2, 2, 2);
     gLayout->setSpacing(2);
 
     QHBoxLayout* btnLayout = new QHBoxLayout();
     btnLayout->setContentsMargins(0, 0, 0, 0);
-    btnLayout->setSpacing(2);
+    btnLayout->setSpacing(3);
 
     // Select Button
     m_btnSelect = new QToolButton(group);
     m_btnSelect->setText("Select");
-    m_btnSelect->setToolButtonStyle(Qt::ToolButtonTextUnderIcon);
-    m_btnSelect->setFixedSize(48, 55);
     m_btnSelect->setIcon(PaintIcons::selectRectIcon(28));
-    m_btnSelect->setIconSize(QSize(22, 22));
-    m_btnSelect->setStyleSheet("QToolButton { background: transparent; border: 1px solid transparent; font-size: 10px; }"
-                               "QToolButton:hover { background: #e5f1fb; border-color: #0078d7; }"
-                               "QToolButton:checked { background: #cce4f7; border-color: #0078d7; }");
+    m_btnSelect->setIconSize(QSize(26, 26));
+    m_btnSelect->setToolButtonStyle(Qt::ToolButtonTextUnderIcon);
+    m_btnSelect->setFixedSize(48, 66);
+    m_btnSelect->setStyleSheet(
+        "QToolButton { background: transparent; border: 1px solid transparent; border-radius: 2px; font-size: 10px; }"
+        "QToolButton:hover { background: #e5f1fb; border-color: #70c0e7; }"
+        "QToolButton:checked { background: #cce8ff; border-color: #3399ff; }"
+    );
 
     QMenu* selMenu = new QMenu(m_btnSelect);
+    selMenu->setStyleSheet("QMenu { background: white; border: 1px solid #c0c0c0; font-size: 11px; } QMenu::item:selected { background: #e5f1fb; }");
     QAction* actRect = selMenu->addAction(PaintIcons::selectRectIcon(16), "Rectangular selection");
     connect(actRect, &QAction::triggered, this, [this]() { emit toolSelected(ActiveTool::SelectRect); });
     QAction* actFree = selMenu->addAction(PaintIcons::selectFreeformIcon(16), "Free-form selection");
@@ -159,33 +175,33 @@ void HomeTab::setupImageGroup(QHBoxLayout* mainLayout) {
     btnLayout->addWidget(m_btnSelect);
 
     QVBoxLayout* smallBtns = new QVBoxLayout();
+    smallBtns->setContentsMargins(0, 0, 0, 0);
     smallBtns->setSpacing(2);
 
-    QToolButton* btnCrop = new QToolButton(group);
-    btnCrop->setText("Crop");
-    btnCrop->setIcon(PaintIcons::cropIcon(16));
-    btnCrop->setToolButtonStyle(Qt::ToolButtonTextBesideIcon);
-    btnCrop->setFixedHeight(18);
-    btnCrop->setStyleSheet("font-size: 10px; background: transparent; border: none;");
+    auto makeImageBtn = [group](const QIcon& icon, const QString& text) {
+        QToolButton* b = new QToolButton(group);
+        b->setText(text);
+        b->setIcon(icon);
+        b->setIconSize(QSize(16, 16));
+        b->setToolButtonStyle(Qt::ToolButtonTextBesideIcon);
+        b->setFixedSize(70, 20);
+        b->setStyleSheet(
+            "QToolButton { background: transparent; border: 1px solid transparent; border-radius: 2px; font-size: 10px; text-align: left; padding-left: 2px; }"
+            "QToolButton:hover { background: #e5f1fb; border-color: #70c0e7; }"
+        );
+        return b;
+    };
+
+    QToolButton* btnCrop = makeImageBtn(PaintIcons::cropIcon(16), "Crop");
     connect(btnCrop, &QToolButton::clicked, this, &HomeTab::cropTriggered);
 
-    QToolButton* btnResize = new QToolButton(group);
-    btnResize->setText("Resize");
-    btnResize->setIcon(PaintIcons::resizeIcon(16));
-    btnResize->setToolButtonStyle(Qt::ToolButtonTextBesideIcon);
-    btnResize->setFixedHeight(18);
-    btnResize->setStyleSheet("font-size: 10px; background: transparent; border: none;");
+    QToolButton* btnResize = makeImageBtn(PaintIcons::resizeIcon(16), "Resize");
     connect(btnResize, &QToolButton::clicked, this, &HomeTab::resizeAndSkewTriggered);
 
-    QToolButton* btnRotate = new QToolButton(group);
-    btnRotate->setText("Rotate");
-    btnRotate->setIcon(PaintIcons::rotateIcon(16));
-    btnRotate->setToolButtonStyle(Qt::ToolButtonTextBesideIcon);
-    btnRotate->setFixedHeight(18);
+    QToolButton* btnRotate = makeImageBtn(PaintIcons::rotateIcon(16), "Rotate");
     btnRotate->setPopupMode(QToolButton::InstantPopup);
-    btnRotate->setStyleSheet("font-size: 10px; background: transparent; border: none;");
-
     QMenu* rotMenu = new QMenu(btnRotate);
+    rotMenu->setStyleSheet("QMenu { background: white; border: 1px solid #c0c0c0; font-size: 11px; } QMenu::item:selected { background: #e5f1fb; }");
     QAction* r90cw = rotMenu->addAction("Rotate right 90°");
     connect(r90cw, &QAction::triggered, this, &HomeTab::rotate90CWTriggered);
     QAction* r90ccw = rotMenu->addAction("Rotate left 90°");
@@ -206,6 +222,7 @@ void HomeTab::setupImageGroup(QHBoxLayout* mainLayout) {
 
     QLabel* label = new QLabel("Image", group);
     label->setAlignment(Qt::AlignCenter);
+    label->setFixedHeight(14);
     label->setStyleSheet("color: #646464; font-size: 11px;");
 
     gLayout->addLayout(btnLayout);
@@ -215,13 +232,14 @@ void HomeTab::setupImageGroup(QHBoxLayout* mainLayout) {
 
 void HomeTab::setupToolsGroup(QHBoxLayout* mainLayout) {
     QWidget* group = new QWidget(this);
+    group->setFixedSize(92, 92);
     QVBoxLayout* gLayout = new QVBoxLayout(group);
-    gLayout->setContentsMargins(0, 0, 0, 0);
+    gLayout->setContentsMargins(2, 2, 2, 2);
     gLayout->setSpacing(2);
 
     QGridLayout* grid = new QGridLayout();
     grid->setSpacing(2);
-    grid->setContentsMargins(0, 0, 0, 0);
+    grid->setContentsMargins(4, 4, 4, 4);
 
     auto makeToolBtn = [group](const QIcon& icon, const QString& tip) {
         QToolButton* b = new QToolButton(group);
@@ -231,11 +249,9 @@ void HomeTab::setupToolsGroup(QHBoxLayout* mainLayout) {
         b->setCheckable(true);
         b->setFixedSize(26, 26);
         b->setStyleSheet(
-            "QToolButton {"
-            "  background: transparent; border: 1px solid transparent; border-radius: 2px;"
-            "}"
-            "QToolButton:hover { background: #e5f1fb; border-color: #0078d7; }"
-            "QToolButton:checked { background: #cce4f7; border-color: #0078d7; }"
+            "QToolButton { background: transparent; border: 1px solid transparent; border-radius: 2px; }"
+            "QToolButton:hover { background: #e5f1fb; border-color: #70c0e7; }"
+            "QToolButton:checked { background: #cce8ff; border-color: #3399ff; }"
         );
         return b;
     };
@@ -267,6 +283,7 @@ void HomeTab::setupToolsGroup(QHBoxLayout* mainLayout) {
 
     QLabel* label = new QLabel("Tools", group);
     label->setAlignment(Qt::AlignCenter);
+    label->setFixedHeight(14);
     label->setStyleSheet("color: #646464; font-size: 11px;");
 
     gLayout->addLayout(grid);

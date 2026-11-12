@@ -376,12 +376,17 @@ void PaintCanvas::updateCursor() {
 
 void PaintCanvas::paintEvent(QPaintEvent* event) {
     QPainter p(this);
-    p.fillRect(rect(), QColor(240, 240, 240)); // Checkered workspace background
+    p.fillRect(rect(), QColor(233, 236, 244)); // Windows 10 workspace gray #e9ecf4
 
     // 1. Draw main canvas image scaled
     int dispW = int(m_image.width() * m_zoom);
     int dispH = int(m_image.height() * m_zoom);
     QRect targetRect(0, 0, dispW, dispH);
+
+    // Subtle drop shadow behind white canvas
+    p.setPen(Qt::NoPen);
+    p.setBrush(QColor(0, 0, 0, 25));
+    p.drawRect(2, 2, dispW, dispH);
 
     p.setRenderHint(QPainter::SmoothPixmapTransform, m_zoom < 1.0);
     p.drawImage(targetRect, m_image);
