@@ -1,0 +1,311 @@
+AfxDlgProc(HWND__*, unsigned int, unsigned long, long)
+AfxGetApp()
+AfxGetInstanceHandle()
+AfxGetMainWnd()
+AfxGetResourceHandle()
+AfxLoadString(unsigned int, char*, unsigned int)
+AfxMessageBox(char const*, unsigned int, unsigned int)
+AfxMessageBox(unsigned int, unsigned int, unsigned int)
+AfxRegisterClass(WNDCLASS*)
+AfxRegisterWndClass(unsigned int, HCURSOR__*, HBRUSH__*, HICON__*)
+AfxThrowMemoryException()
+AfxThrowResourceException()
+CBitmap::CreateBitmap(int, int, unsigned int, unsigned int, void const*)
+CBitmap::CreateCompatibleBitmap(CDC*, int, int)
+CBitmap::FromHandle(HBITMAP__*)
+CBitmap::GetRuntimeClass() const
+CBitmap::LoadBitmap(char const*)
+CBitmap::LoadBitmap(unsigned int)
+CBrush::CBrush(unsigned int)
+CBrush::CreatePatternBrush(CBitmap*)
+CBrush::CreateSolidBrush(unsigned int)
+CBrush::FromHandle(HBRUSH__*)
+CClientDC::CClientDC(CWnd*)
+CClientDC::~CClientDC()
+CCmdTarget::GetRuntimeClass() const
+CCmdTarget::OnCmdMsg(unsigned int, int, void*, AFX_CMDHANDLERINFO*)
+CColorDialog::CColorDialog(unsigned int, unsigned int, CWnd*)
+CColorDialog::DoModal()
+CControlBar::GetMessageMap() const
+CControlBar::GetRuntimeClass() const
+CControlBar::GetThisMessageMap()
+CControlBar::classCControlBar
+CDC::Attach(HDC__*)
+CDC::BitBlt(int, int, int, int, CDC*, int, int, unsigned int)
+CDC::CDC()
+CDC::CreateCompatibleDC(CDC*)
+CDC::CreateIC(char const*, char const*, char const*, void const*)
+CDC::DeleteDC()
+CDC::Detach()
+CDC::DrawFocusRect(RECT const*)
+CDC::DrawText(char const*, int, RECT*, unsigned int)
+CDC::ExcludeClipRect(RECT const*)
+CDC::ExcludeUpdateRgn(CWnd*)
+CDC::ExtFloodFill(int, int, unsigned int, unsigned int)
+CDC::ExtTextOut(int, int, unsigned int, RECT const*, char const*, unsigned int, int*)
+CDC::FillRect(RECT const*, CBrush*)
+CDC::FillRgn(CRgn*, CBrush*)
+CDC::FrameRect(RECT const*, CBrush*)
+CDC::FrameRgn(CRgn*, CBrush*, int, int)
+CDC::FromHandle(HDC__*)
+CDC::GetBkMode() const
+CDC::GetClipBox(RECT*) const
+CDC::GetDeviceCaps(int) const
+CDC::GetPixel(int, int) const
+CDC::GetTextColor() const
+CDC::GetTextExtent(char const*, int) const
+CDC::GetTextMetrics(TEXTMETRIC*) const
+CDC::IntersectClipRect(RECT const*)
+CDC::LineTo(int, int)
+CDC::MoveTo(int, int)
+CDC::OffsetViewportOrg(int, int)
+CDC::PatBlt(int, int, int, int, unsigned int)
+CDC::Polygon(POINT*, int)
+CDC::Polyline(POINT*, int)
+CDC::PtVisible(int, int) const
+CDC::RealizePalette()
+CDC::RectVisible(RECT const*) const
+CDC::Rectangle(RECT const*)
+CDC::Rectangle(int, int, int, int)
+CDC::RestoreDC(int)
+CDC::SaveDC()
+CDC::SelectClipRgn(CRgn*)
+CDC::SelectObject(CBitmap*)
+CDC::SelectObject(CBrush*)
+CDC::SelectObject(CFont*)
+CDC::SelectObject(CGdiObject*)
+CDC::SelectObject(CPen*)
+CDC::SelectPalette(CPalette*, int)
+CDC::SelectStockObject(int)
+CDC::SetBkColor(unsigned int)
+CDC::SetBkMode(int)
+CDC::SetBrushOrg(int, int)
+CDC::SetROP2(int)
+CDC::SetStretchBltMode(int)
+CDC::SetTextColor(unsigned int)
+CDC::SetViewportExt(int, int)
+CDC::SetViewportOrg(int, int)
+CDC::SetWindowExt(int, int)
+CDC::SetWindowOrg(int, int)
+CDC::StretchBlt(int, int, int, int, CDC*, int, int, int, int, unsigned int)
+CDC::TabbedTextOut(int, int, char const*, int, int, int*, int)
+CDC::TextOut(int, int, char const*, int)
+CDC::classCDC
+CDC::~CDC()
+CDialog::DoModal()
+CDialog::GetMessageMap() const
+CDialog::GetRuntimeClass() const
+CDialog::GetThisMessageMap()
+CDialogBar::GetThisMessageMap()
+CDialogBar::classCDialogBar
+CDocument::ReleaseFile(CFile*, int)
+CEdit::GetThisMessageMap()
+CEdit::classCEdit
+CFile::Abort()
+CFile::CFile()
+CFile::Close()
+CFile::Flush()
+CFile::GetLength() const
+CFile::GetPosition() const
+CFile::GetStatus(char const*, CFileStatus&)
+CFile::Open(char const*, unsigned int, CFileException*)
+CFile::Read(void*, unsigned int)
+CFile::Remove(char const*)
+CFile::Rename(char const*, char const*)
+CFile::Seek(int, unsigned int)
+CFile::SetLength(unsigned int)
+CFile::Write(void const*, unsigned int)
+CFile::~CFile()
+CFont::CreateFontIndirect(LOGFONT const*)
+CFont::FromHandle(HFONT__*)
+CFrameWnd::ActivateFrame(int)
+CFrameWnd::CFrameWnd()
+CFrameWnd::DockControlBar(CControlBar*, unsigned int, RECT const*)
+CFrameWnd::GetActiveDocument()
+CFrameWnd::GetThisMessageMap()
+CFrameWnd::NegotiateBorderSpace(unsigned int, RECT*)
+CFrameWnd::OnBarCheck(unsigned int)
+CFrameWnd::OnUpdateControlBarMenu(CCmdUI*)
+CFrameWnd::RecalcLayout(int)
+CFrameWnd::classCFrameWnd
+CFrameWnd::~CFrameWnd()
+CGdiObject::Attach(void*)
+CGdiObject::DeleteObject()
+CGdiObject::Detach()
+CGdiObject::GetObject(int, void*) const
+CMenu::TrackPopupMenu(unsigned int, int, int, CWnd*, RECT const*)
+CObject::classCObject
+COleIPFrameWnd::GetThisMessageMap()
+COleIPFrameWnd::classCOleIPFrameWnd
+COleServerDoc::GetThisMessageMap()
+COleServerDoc::classCOleServerDoc
+COleServerItem::classCOleServerItem
+CPaintDC::CPaintDC(CWnd*)
+CPaintDC::classCPaintDC
+CPaintDC::~CPaintDC()
+CPalette::CreatePalette(LOGPALETTE*)
+CPalette::FromHandle(HPALETTE__*)
+CPalette::GetNearestPaletteIndex(unsigned int) const
+CPalette::GetPaletteEntries(unsigned int, unsigned int, PALETTEENTRY*) const
+CPalette::ResizePalette(unsigned int)
+CPalette::SetPaletteEntries(unsigned int, unsigned int, PALETTEENTRY*)
+CRgn::CreatePolygonRgn(POINT*, int, int)
+CRgn::CreateRectRgnIndirect(RECT const*)
+CRgn::OffsetRgn(int, int)
+CStatusBar::Create(CWnd*, unsigned int, unsigned int)
+CStatusBar::GetItemRect(int, RECT*) const
+CStatusBar::GetPaneInfo(int, unsigned int&, unsigned int&, int&) const
+CStatusBar::GetPaneText(int, CString&) const
+CStatusBar::GetThisMessageMap()
+CStatusBar::SetIndicators(unsigned int const*, int)
+CStatusBar::SetPaneInfo(int, unsigned int, unsigned int, int)
+CStatusBar::SetPaneText(int, char const*, int)
+CStatusBar::classCStatusBar
+CToolBar::GetThisMessageMap()
+CToolBar::classCToolBar
+CView::GetThisMessageMap()
+CView::classCView
+CWinApp::GetRuntimeClass() const
+CWinApp::GetThisMessageMap()
+CWinApp::LoadCursor(unsigned int) const
+CWinApp::LoadIcon(unsigned int) const
+CWinApp::LoadStandardCursor(char const*) const
+CWindowDC::CWindowDC(CWnd*)
+CWindowDC::~CWindowDC()
+CWnd::BeginPaint(PAINTSTRUCT*)
+CWnd::CWnd()
+CWnd::ClientToScreen(POINT*) const
+CWnd::ClientToScreen(RECT*) const
+CWnd::Create(char const*, char const*, unsigned int, RECT const&, CWnd*, unsigned int, void*)
+CWnd::CreateEx(unsigned int, char const*, char const*, unsigned int, RECT const&, CWnd*, unsigned int, void*)
+CWnd::CreateEx(unsigned int, char const*, char const*, unsigned int, int, int, int, int, HWND__*, void*, void*)
+CWnd::DestroyWindow()
+CWnd::EnableScrollBar(int, unsigned int)
+CWnd::EnableWindow(int)
+CWnd::EndPaint(PAINTSTRUCT*)
+CWnd::FromHandle(HWND__*)
+CWnd::FromHandlePermanent(HWND__*)
+CWnd::GetCapture()
+CWnd::GetClientRect(RECT*) const
+CWnd::GetDC()
+CWnd::GetDlgItem(int) const
+CWnd::GetFocus()
+CWnd::GetMenu() const
+CWnd::GetParentFrame() const
+CWnd::GetThisMessageMap()
+CWnd::GetWindowDC()
+CWnd::GetWindowPlacement(WINDOWPLACEMENT*) const
+CWnd::GetWindowRect(RECT*) const
+CWnd::Invalidate(int)
+CWnd::InvalidateRect(RECT const*, int)
+CWnd::MessageBox(char const*, char const*, unsigned int)
+CWnd::MoveWindow(int, int, int, int, int)
+CWnd::OnCommand(unsigned long, long)
+CWnd::PostMessage(unsigned int, unsigned long, long)
+CWnd::RedrawWindow(RECT const*, CRgn*, unsigned int)
+CWnd::ReleaseDC(CDC*)
+CWnd::ScreenToClient(POINT*) const
+CWnd::ScreenToClient(RECT*) const
+CWnd::SendMessage(unsigned int, unsigned long, long)
+CWnd::SetCapture()
+CWnd::SetFocus()
+CWnd::SetTimer(unsigned long, unsigned int, void (*)(HWND__*, unsigned int, unsigned long, unsigned int))
+CWnd::SetWindowPlacement(WINDOWPLACEMENT const*)
+CWnd::SetWindowPos(CWnd const*, int, int, int, int, unsigned int)
+CWnd::ShowWindow(int)
+CWnd::UpdateWindow()
+CWnd::ValidateRect(RECT const*)
+CWnd::classCWnd
+CWnd::wndTop
+CWnd::wndTopMost
+CWnd::~CWnd()
+DispatchMessage(MSG const*)
+ExtTextOut(HDC__*, int, int, unsigned int, RECT const*, char const*, unsigned int, int const*)
+GetCapture()
+GetClassInfo(void*, char const*, WNDCLASS*)
+GetCursorPos(POINT*)
+GetDC(HWND__*)
+GetDesktopWindow()
+GetKeyState(int)
+GetSysColor(int)
+GetSystemMetrics(int)
+GetTempFileName(char const*, char const*, unsigned int, char*)
+GetTempPath(unsigned int, char*)
+GetTickCount()
+GetWindowLong(HWND__*, int)
+GlobalAlloc(unsigned int, unsigned long)
+GlobalFree(void*)
+GlobalLock(void*)
+GlobalReAlloc(void*, unsigned long, unsigned int)
+GlobalUnlock(void*)
+InvalidateRect(HWND__*, RECT const*, int)
+IsClipboardFormatAvailable(unsigned int)
+IsWindow(HWND__*)
+LoadCursor(void*, char const*)
+LoadIcon(void*, char const*)
+LoadString(void*, unsigned int, char*, int)
+MessageBeep(unsigned int)
+MessageBox(HWND__*, char const*, char const*, unsigned int)
+PeekMessage(MSG*, HWND__*, unsigned int, unsigned int, unsigned int)
+RegisterClipboardFormat(char const*)
+ReleaseCapture()
+ReleaseDC(HWND__*, HDC__*)
+SetCursor(HCURSOR__*)
+SetWindowLong(HWND__*, int, int)
+SetWindowText(HWND__*, char const*)
+ShowCursor(int)
+TranslateMessage(MSG const*)
+WiaImgFmt_BMP
+WiaImgFmt_EMF
+WiaImgFmt_GIF
+WiaImgFmt_JPEG
+WiaImgFmt_MEMORYBMP
+WiaImgFmt_PHOTOCD
+WiaImgFmt_PNG
+WiaImgFmt_TIFF
+WiaImgFmt_UNDEFINED
+WiaImgFmt_WMF
+__argc
+__argv
+_itoa(int, char*, int)
+_tsplitpath(char const*, char*, char*, char*, char*)
+main
+typeinfo for CBitmap
+typeinfo for CCmdTarget
+typeinfo for CControlBar
+typeinfo for CDC
+typeinfo for CDialog
+typeinfo for CDialogBar
+typeinfo for CEdit
+typeinfo for CFile
+typeinfo for CFrameWnd
+typeinfo for COleIPFrameWnd
+typeinfo for COleServerDoc
+typeinfo for COleServerItem
+typeinfo for CStatusBar
+typeinfo for CToolBar
+typeinfo for CView
+typeinfo for CWinApp
+typeinfo for CWnd
+vtable for CBitmap
+vtable for CBrush
+vtable for CCmdTarget
+vtable for CComboBox
+vtable for CControlBar
+vtable for CDialog
+vtable for CDialogBar
+vtable for CDocument
+vtable for CEdit
+vtable for CFont
+vtable for CGdiObject
+vtable for CMenu
+vtable for COleIPFrameWnd
+vtable for COleServerDoc
+vtable for COleServerItem
+vtable for CPalette
+vtable for CProgressCtrl
+vtable for CRgn
+vtable for CStatusBar
+vtable for CToolBar
+vtable for CView
+vtable for CWinApp
