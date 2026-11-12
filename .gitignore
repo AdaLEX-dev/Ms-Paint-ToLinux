@@ -1,3 +1,7 @@
+build/
 *.o
-*.ppm
-mspaint
+*.a
+*.so
+test_sample.png
+.vscode/
+.idea/
