@@ -81,9 +81,11 @@ void ColorPalette::setupUI() {
     m_card1 = createColorCard("Color\n1", m_swatchPreview1);
     m_card2 = createColorCard("Color\n2", m_swatchPreview2);
 
-    // Click on Card 1
+    // Click on Card 1 or Card 2
     m_card1->installEventFilter(this);
     m_card2->installEventFilter(this);
+    m_swatchPreview1->installEventFilter(this);
+    m_swatchPreview2->installEventFilter(this);
 
     topLayout->addWidget(m_card1);
     topLayout->addWidget(m_card2);
@@ -99,24 +101,16 @@ void ColorPalette::setupUI() {
             QToolButton* btn = new QToolButton(this);
             btn->setFixedSize(14, 14);
             QColor c = colors[col];
+            btn->setProperty("colorValue", c);
             btn->setStyleSheet(QString("QToolButton { background-color: %1; border: 1px solid #999999; border-radius: 1px; }"
                                        "QToolButton:hover { border: 1px solid #0078d7; }").arg(c.name()));
 
             connect(btn, &QToolButton::clicked, this, [this, btn]() {
-                // Get color from style or attribute
-                QColor c = btn->palette().button().color();
-                // extract from stylesheet
-                QString ss = btn->styleSheet();
-                int idx = ss.indexOf("background-color: ");
-                if (idx != -1) {
-                    QString hex = ss.mid(idx + 18, 7);
-                    c = QColor(hex);
-                }
-
+                QColor pickedColor = btn->property("colorValue").value<QColor>();
                 if (m_editingColor1) {
-                    setColor1(c);
+                    setColor1(pickedColor);
                 } else {
-                    setColor2(c);
+                    setColor2(pickedColor);
                 }
             });
 
@@ -185,10 +179,10 @@ void ColorPalette::selectColor2Mode() {
 
 bool ColorPalette::eventFilter(QObject* watched, QEvent* event) {
     if (event->type() == QEvent::MouseButtonPress) {
-        if (watched == m_card1) {
+        if (watched == m_card1 || watched == m_swatchPreview1) {
             selectColor1Mode();
             return true;
-        } else if (watched == m_card2) {
+        } else if (watched == m_card2 || watched == m_swatchPreview2) {
             selectColor2Mode();
             return true;
         }
@@ -247,6 +241,7 @@ void ColorPalette::onEditColorsClicked() {
         m_row3.prepend(picked);
 
         for (int i = 0; i < m_customButtons.size() && i < m_row3.size(); ++i) {
+            m_customButtons[i]->setProperty("colorValue", m_row3[i]);
             m_customButtons[i]->setStyleSheet(QString("QToolButton { background-color: %1; border: 1px solid #999999; border-radius: 1px; }"
                                                       "QToolButton:hover { border: 1px solid #0078d7; }").arg(m_row3[i].name()));
         }

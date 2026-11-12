@@ -2,6 +2,7 @@
 
 #include <QIcon>
 #include <QPixmap>
+#include <QCursor>
 #include "../Tools/ToolTypes.h"
 
 class PaintIcons {
@@ -35,6 +36,7 @@ public:
     static QIcon textIcon(int size = 20);
     static QIcon eraserIcon(int size = 20);
     static QIcon colorPickerIcon(int size = 20);
+    static QCursor colorPickerCursor();
     static QIcon magnifierIcon(int size = 20);
 
     // Brushes

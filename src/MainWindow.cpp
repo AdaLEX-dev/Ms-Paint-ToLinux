@@ -42,6 +42,7 @@ void MainWindow::setupUI() {
     // Connect Ribbon Home Tab to Canvas
     HomeTab* home = m_ribbonBar->homeTab();
     connect(home, &HomeTab::toolSelected, m_canvas, &PaintCanvas::setActiveTool);
+    connect(m_canvas, &PaintCanvas::toolChanged, home, &HomeTab::setActiveTool);
     connect(home, &HomeTab::pasteTriggered, this, [this]() {
         QImage clip = QApplication::clipboard()->image();
         if (!clip.isNull()) m_canvas->paste(clip);

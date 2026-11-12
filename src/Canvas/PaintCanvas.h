@@ -23,6 +23,8 @@ public:
     bool openImage(const QString& filePath);
     bool saveImage(const QString& filePath, const char* format = nullptr);
     QSize imageSize() const { return m_image.size(); }
+    QImage& image() { return m_image; }
+    const QImage& image() const { return m_image; }
     void resizeCanvas(int newWidth, int newHeight);
     void cropToSelection();
 
@@ -57,7 +59,15 @@ public:
     bool canRedo() const { return m_undoIndex < m_undoStack.size() - 1; }
 
     // Tool Settings
-    void setActiveTool(ActiveTool tool) { commitSelection(); m_tool = tool; updateCursor(); update(); }
+    void setActiveTool(ActiveTool tool) {
+        commitSelection();
+        if (m_tool != ActiveTool::ColorPicker && m_tool != ActiveTool::Magnifier) {
+            m_previousTool = m_tool;
+        }
+        m_tool = tool;
+        updateCursor();
+        update();
+    }
     ActiveTool activeTool() const { return m_tool; }
 
     void setBrushType(BrushType type) { m_brushType = type; }
@@ -102,6 +112,7 @@ signals:
     void zoomChanged(double zoom);
     void color1Picked(QColor c);
     void color2Picked(QColor c);
+    void toolChanged(ActiveTool tool);
     void undoStateChanged(bool canUndo, bool canRedo);
 
 protected:
@@ -142,6 +153,7 @@ private:
 
     // Tool states
     ActiveTool m_tool = ActiveTool::Pencil;
+    ActiveTool m_previousTool = ActiveTool::Pencil;
     BrushType m_brushType = BrushType::Standard;
     ShapeType m_shapeType = ShapeType::Line;
     ShapeStyle m_outlineStyle = ShapeStyle::Solid;

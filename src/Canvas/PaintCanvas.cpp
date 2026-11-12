@@ -1,7 +1,9 @@
 #include "PaintCanvas.h"
+#include "../Ribbon/PaintIcons.h"
 #include <QPainterPath>
 #include <QApplication>
 #include <QClipboard>
+#include <QFontDialog>
 #include <QQueue>
 #include <QRandomGenerator>
 #include <cmath>
@@ -250,8 +252,9 @@ void PaintCanvas::commitText() {
     pushUndo();
     QPainter p(&m_image);
     p.setFont(m_textFont);
-    p.setPen(m_color1);
-    p.drawText(m_textRect, Qt::AlignLeft | Qt::AlignTop | Qt::TextWordWrap, m_textString);
+    QColor textColor = (m_color1.isValid() && m_color1 != Qt::white) ? m_color1 : Qt::black;
+    p.setPen(textColor);
+    p.drawText(m_textRect.adjusted(4, 4, -4, -4), Qt::AlignLeft | Qt::AlignTop | Qt::TextWordWrap, m_textString);
     p.end();
     m_isTypingText = false;
     m_textString.clear();
@@ -353,7 +356,7 @@ void PaintCanvas::updateCursor() {
             setCursor(Qt::PointingHandCursor);
             break;
         case ActiveTool::ColorPicker:
-            setCursor(Qt::CrossCursor);
+            setCursor(PaintIcons::colorPickerCursor());
             break;
         case ActiveTool::Magnifier:
             setCursor(Qt::PointingHandCursor);
@@ -427,11 +430,13 @@ void PaintCanvas::paintEvent(QPaintEvent* event) {
     // 5. In-place text box
     if (m_isTypingText) {
         QRect textDisp = canvasToWidget(m_textRect);
-        p.setPen(QPen(Qt::blue, 1, Qt::DashLine));
+        p.fillRect(textDisp, QColor(255, 255, 255, 235));
+        p.setPen(QPen(QColor(0, 120, 215), 1, Qt::DashLine));
         p.drawRect(textDisp);
         p.setFont(m_textFont);
-        p.setPen(m_color1);
-        p.drawText(textDisp, Qt::AlignLeft | Qt::AlignTop | Qt::TextWordWrap, m_textString + "|");
+        QColor textColor = (m_color1.isValid() && m_color1 != Qt::white) ? m_color1 : Qt::black;
+        p.setPen(textColor);
+        p.drawText(textDisp.adjusted(4, 4, -4, -4), Qt::AlignLeft | Qt::AlignTop | Qt::TextWordWrap, m_textString + "|");
     }
 
     // 6. Canvas borders and resize handles
@@ -513,7 +518,7 @@ void PaintCanvas::mousePressEvent(QMouseEvent* event) {
             break;
 
         case ActiveTool::ColorPicker: {
-            if (m_image.valid(cPos)) {
+            if (m_image.rect().contains(cPos)) {
                 QColor c = m_image.pixelColor(cPos);
                 if (m_isRightButton) {
                     m_color2 = c;
@@ -523,7 +528,7 @@ void PaintCanvas::mousePressEvent(QMouseEvent* event) {
                     emit color1Picked(c);
                 }
             }
-            m_isDrawing = false;
+            m_isDrawing = true;
             break;
         }
 
@@ -538,11 +543,26 @@ void PaintCanvas::mousePressEvent(QMouseEvent* event) {
         }
 
         case ActiveTool::Text: {
+            if (m_isRightButton) {
+                bool ok = false;
+                QFont f = QFontDialog::getFont(&ok, m_textFont, this, "Select Font");
+                if (ok) {
+                    m_textFont = f;
+                    update();
+                }
+                return;
+            }
             if (!m_isTypingText) {
+                if (!m_color1.isValid() || m_color1 == Qt::white) {
+                    m_color1 = Qt::black;
+                    emit color1Picked(Qt::black);
+                }
                 m_isTypingText = true;
                 m_textRect = QRect(cPos, QSize(250, 100));
                 m_textString.clear();
                 update();
+            } else {
+                commitText();
             }
             break;
         }
@@ -612,6 +632,19 @@ void PaintCanvas::mouseMoveEvent(QMouseEvent* event) {
             update();
             break;
 
+        case ActiveTool::ColorPicker:
+            if (m_image.rect().contains(cPos)) {
+                QColor c = m_image.pixelColor(cPos);
+                if (m_isRightButton) {
+                    m_color2 = c;
+                    emit color2Picked(c);
+                } else {
+                    m_color1 = c;
+                    emit color1Picked(c);
+                }
+            }
+            break;
+
         case ActiveTool::SelectRect: {
             QRect sel(m_startCanvasPos, cPos);
             emit selectionSizeChanged(sel.normalized().size());
@@ -652,6 +685,24 @@ void PaintCanvas::mouseReleaseEvent(QMouseEvent* event) {
     m_isDrawing = false;
 
     QPoint cPos = widgetToCanvas(event->pos());
+
+    if (m_tool == ActiveTool::ColorPicker) {
+        if (m_image.rect().contains(cPos)) {
+            QColor c = m_image.pixelColor(cPos);
+            if (m_isRightButton) {
+                m_color2 = c;
+                emit color2Picked(c);
+            } else {
+                m_color1 = c;
+                emit color1Picked(c);
+            }
+        }
+        ActiveTool nextTool = (m_previousTool == ActiveTool::ColorPicker || m_previousTool == ActiveTool::Magnifier)
+                                ? ActiveTool::Pencil : m_previousTool;
+        setActiveTool(nextTool);
+        emit toolChanged(nextTool);
+        return;
+    }
 
     if (m_tool == ActiveTool::SelectRect) {
         QRect r(m_startCanvasPos, cPos);

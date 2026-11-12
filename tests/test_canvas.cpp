@@ -50,6 +50,32 @@ int main(int argc, char* argv[]) {
     assert(loaded);
     assert(loader.imageSize() == canvas.imageSize());
 
+    std::cout << "[Test] Testing ColorPicker & Text Tools..." << std::endl;
+    // Draw a green patch
+    canvas.newImage(200, 200, Qt::white);
+    QPainter p(&canvas.image());
+    p.fillRect(10, 10, 20, 20, Qt::green);
+    p.end();
+
+    // Select color picker and pick green
+    canvas.setActiveTool(ActiveTool::Pencil);
+    canvas.setActiveTool(ActiveTool::ColorPicker);
+    assert(canvas.activeTool() == ActiveTool::ColorPicker);
+
+    // Simulate mouse click on the green patch
+    QMouseEvent pressEv(QEvent::MouseButtonPress, QPointF(15, 15), QPointF(15, 15), Qt::LeftButton, Qt::LeftButton, Qt::NoModifier);
+    QMouseEvent releaseEv(QEvent::MouseButtonRelease, QPointF(15, 15), QPointF(15, 15), Qt::LeftButton, Qt::LeftButton, Qt::NoModifier);
+    QApplication::sendEvent(&canvas, &pressEv);
+    QApplication::sendEvent(&canvas, &releaseEv);
+
+    // Assert picked color is green and tool returned to Pencil
+    assert(canvas.color1() == Qt::green);
+    assert(canvas.activeTool() == ActiveTool::Pencil);
+
+    // Test text tool initialization
+    canvas.setActiveTool(ActiveTool::Text);
+    assert(canvas.color1() != Qt::white); // Must not be white on white
+
     std::cout << "[Test] ALL TESTS PASSED SUCCESSFULLY!" << std::endl;
     return 0;
 }

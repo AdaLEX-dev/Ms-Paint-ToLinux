@@ -631,6 +631,42 @@ QIcon PaintIcons::colorPickerIcon(int size) {
     return QIcon(pix);
 }
 
+QCursor PaintIcons::colorPickerCursor() {
+    QPixmap pix(24, 24);
+    pix.fill(Qt::transparent);
+    QPainter p(&pix);
+    setupHighQuality(p);
+
+    // Precise eyedropper cursor with tip pointing at (1, 22)
+    p.save();
+    p.translate(1, 22);
+    p.rotate(-45);
+
+    // Glass nozzle
+    QPolygonF nozzle;
+    nozzle << QPointF(0, 0) << QPointF(-2, -4) << QPointF(2, -4);
+    p.setPen(QPen(Qt::black, 1));
+    p.setBrush(QColor(230, 240, 255));
+    p.drawPolygon(nozzle);
+
+    // Glass tube
+    QRectF tube(-2, -18, 4, 14);
+    p.fillRect(tube, QColor(240, 248, 255));
+    p.fillRect(QRectF(-1.5, -12, 3, 8), QColor(0, 100, 200));
+    p.setPen(QPen(Qt::black, 1));
+    p.setBrush(Qt::NoBrush);
+    p.drawRect(tube);
+
+    // Rubber bulb
+    p.setPen(QPen(Qt::black, 1));
+    p.setBrush(QColor(210, 40, 40));
+    p.drawEllipse(QRectF(-3.5, -24, 7, 6));
+
+    p.restore();
+
+    return QCursor(pix, 1, 22);
+}
+
 QIcon PaintIcons::magnifierIcon(int size) {
     QPixmap pix(size, size);
     pix.fill(Qt::transparent);
